@@ -1,13 +1,19 @@
+#pragma once
+
 #include <memory>
 #include <string>
+#include <sstream>
 #include "LogLevel.h"
-#include "Logger.h"
+
+namespace shs {
+
+class Logger;
 
 // 日志事件
 class LogEvent {
 public:
     using ptr = std::shared_ptr<LogEvent>;
-    LogEvent(Logger::ptr logger, LogLevel level, const std::string& file, int32_t line, uint32_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time, const std::string& thread_name);
+    LogEvent(std::shared_ptr<Logger> logger, LogLevel level, const std::string& file, int32_t line, uint32_t elapse, uint32_t thread_id, uint32_t fiber_id, uint64_t time, const std::string& thread_name);
 
     const std::string& getFile() const { return m_file; }
     int32_t getLine() const { return m_line;}
@@ -18,7 +24,7 @@ public:
     const std::string& getThreadName() const { return m_threadName;}
     std::string getContent() const { return m_ss.str();}
     std::stringstream& getSS() { return m_ss;}
-    Logger::ptr getLogger() const { return m_logger; }
+    std::shared_ptr<Logger> getLogger() const { return m_logger; }
     LogLevel getLevel() const { return m_level; }
 
     void format(const char* fmt, ...);
@@ -34,7 +40,8 @@ private:
     uint64_t m_time;            // 时间戳
     std::string m_threadName;   // 线程名称
     std::stringstream m_ss;     // 日志内容流
-    Logger::ptr m_logger;       // 日志器
+    std::shared_ptr<Logger> m_logger;       // 日志器
     LogLevel m_level;           // 日志级别
 };
 
+}

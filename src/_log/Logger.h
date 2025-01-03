@@ -1,26 +1,31 @@
+#pragma once
+
 #include <memory>
 #include <string>
 #include "LogLevel.h"
-#include "LogEvent.h"
+#include "list"
+namespace shs {
 
+class LogAppender;
+class LogEvent;
 // 日志器
 class Logger: public std::enable_shared_from_this<Logger> {
 public:
     using ptr = std::shared_ptr<Logger>;
 
     Logger(const std::string& name = "root");
-    void log(LogLevel level, LogEvent::ptr event);
+    void log(LogLevel level, std::shared_ptr<LogEvent> event);
 
     // 不同级别额日志打印
-    void debug(LogEvent::ptr event);
-    void info(LogEvent::ptr event);
-    void warn(LogEvent::ptr event);
-    void error(LogEvent::ptr event);
-    void fatal(LogEvent::ptr event);
+    void debug(std::shared_ptr<LogEvent> event);
+    void info(std::shared_ptr<LogEvent> event);
+    void warn(std::shared_ptr<LogEvent> event);
+    void error(std::shared_ptr<LogEvent> event);
+    void fatal(std::shared_ptr<LogEvent> event);
 
     // 对 Appender 集合的操作
-    void addAppender(LogAppender::ptr appender);
-    void delAppender(LogAppender::ptr appender);
+    void addAppender(std::shared_ptr<LogAppender> appender);
+    void delAppender(std::shared_ptr<LogAppender> appender);
 
     // 对日志级别的操作
     void setLevel(LogLevel level) { m_level = level; }
@@ -28,9 +33,11 @@ public:
     const std::string& getName() const { return m_name; }
 private:
     std::string m_name;                         // 日志名称
-    LogLevel m_level;                           // 日志级别
-    // LogAppender::ptr m_appender;
-    std::list<LogAppender::ptr> m_appenders;    // Appender 集合
+    LogLevel m_level = LogLevel::DEBUG;                           // 日志级别
+    // std::shared_ptr<LogAppender> m_appender;
+    std::list<std::shared_ptr<LogAppender>> m_appenders;    // Appender 集合
 
 };
 
+
+}
