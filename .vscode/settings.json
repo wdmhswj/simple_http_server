@@ -73,6 +73,8 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "*.def": "cpp",
+        "*.inc": "cpp"
     }
 }
