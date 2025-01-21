@@ -2,8 +2,12 @@
 
 #include <memory>
 #include <string>
-#include <sstream>
+#include <cstdarg>    // va_list 和可变参数支持
+#include <sstream>    // std::stringstream
+
 #include "LogLevel.h"
+
+
 
 namespace shs {
 
@@ -44,4 +48,18 @@ private:
     LogLevel m_level;           // 日志级别
 };
 
+// 日志事件包装器
+class LogEventWrap {
+public:
+    LogEventWrap(LogEvent::ptr e);
+
+    ~LogEventWrap();
+
+    LogEvent::ptr getEvent() const { return m_event; }
+
+    // 获取日志内容流
+    std::stringstream& getSS();
+private:
+    LogEvent::ptr m_event;
+};
 }

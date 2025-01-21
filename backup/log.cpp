@@ -43,7 +43,7 @@ void Logger::warn(LogEvent::ptr event) {
     log(LogLevel::WARN, event);
 }
 void Logger::error(LogEvent::ptr event) {
-    log(LogLevel::ERROR, event);
+    log(LogLevel::ERROR_, event);
 }
 void Logger::fatal(LogEvent::ptr event) {
     log(LogLevel::FATAL, event);
@@ -342,7 +342,7 @@ void LogFormatter::init() {
                 m_items.push_back(it->second(std::get<1>(i)));
             }
         }
-        std::cout << "(" << std::get<0>(i) << ") - (" << std::get<1>(i) << ") - (" <<std::get<2>(i) << ")" << std::endl;
+        // std::cout << "(" << std::get<0>(i) << ") - (" << std::get<1>(i) << ") - (" <<std::get<2>(i) << ")" << std::endl;
     }
 
 }

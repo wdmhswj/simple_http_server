@@ -8,6 +8,8 @@ namespace shs {
 
 class LogAppender;
 class LogEvent;
+class LogFormatter;
+
 // 日志器
 class Logger: public std::enable_shared_from_this<Logger> {
 public:
@@ -31,11 +33,15 @@ public:
     void setLevel(LogLevel level) { m_level = level; }
     LogLevel getLevel() const { return m_level; }
     const std::string& getName() const { return m_name; }
+
+    void setRoot(Logger::ptr root) { m_root = root; }
 private:
     std::string m_name;                         // 日志名称
-    LogLevel m_level = LogLevel::DEBUG;                           // 日志级别
+    LogLevel m_level;                           // 日志级别
+    std::shared_ptr<LogFormatter> m_formatter;              // 日志格式器
     // std::shared_ptr<LogAppender> m_appender;
     std::list<std::shared_ptr<LogAppender>> m_appenders;    // Appender 集合
+    Logger::ptr m_root;                                     // 主日志器
 
 };
 

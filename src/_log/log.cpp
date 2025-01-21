@@ -2,12 +2,17 @@
 #include <map>
 #include <functional>
 #include <iostream>
+#include <ctime>
+#include <cstdlib>    // free
+#include <cstdio>     // vasprintf
 
 #include "LogAppender.h"
 #include "LogEvent.h"
 #include "LogFormatter.h"
 #include "Logger.h"
 #include "LogLevel.h"
+#include "LoggerManager.h"
+#include "../util/util.h"
 
 namespace shs {
 
@@ -24,9 +29,13 @@ LogEvent::LogEvent(Logger::ptr logger, LogLevel level, const std::string& file, 
 {
 }
 
-Logger::Logger(const std::string& name): m_name(name) {
-
+Logger::Logger(const std::string& name)
+    : m_name(name)
+    , m_level(LogLevel::DEBUG) {
+    m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"));
 }
+
+
 void Logger::log(LogLevel level, std::shared_ptr<LogEvent> event) {
     // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
     // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
@@ -51,7 +60,7 @@ void Logger::warn(std::shared_ptr<LogEvent> event) {
     log(LogLevel::WARN, event);
 }
 void Logger::error(std::shared_ptr<LogEvent> event) {
-    log(LogLevel::ERROR, event);
+    log(LogLevel::ERROR_, event);
 }
 void Logger::fatal(std::shared_ptr<LogEvent> event) {
     log(LogLevel::FATAL, event);
@@ -72,7 +81,10 @@ void Logger::delAppender(std::shared_ptr<LogAppender> appender) {
 
 
 LogAppender::LogAppender(LogLevel level, LogFormatter::ptr formatter): m_level(level), m_formatter(formatter) {
-
+    if(m_formatter==nullptr) {
+        m_formatter = std::make_shared<LogFormatter>("%d%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");
+        
+    }
 }
 
 
@@ -81,18 +93,21 @@ void StdoutLogAppender::log(Logger::ptr logger, LogLevel level, LogEvent::ptr ev
     // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
     // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
     if(m_formatter==nullptr) 
-        std::cout << "nullptr" << std::endl;
+        std::cout << "m_formatter is nullptr" << std::endl;
     if(level >= m_level)
         std::cout << m_formatter->format(logger, level, event) << std::endl;
 }
 
 void FileLogAppender::log(Logger::ptr logger, LogLevel level, LogEvent::ptr event) {
+    std::cout << "FileLogAppender::log\n";
+    std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
+    std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
     if(level >= m_level)
         m_filestream << m_formatter->format(logger, level, event) << std::endl;
 }
 
 FileLogAppender::FileLogAppender(const std::string& filename): m_filename(filename) {
-
+    this->reopen();
 }
 
 bool FileLogAppender::reopen() {
@@ -111,7 +126,7 @@ LogFormatter::LogFormatter(const std::string& pattern): m_pattern(pattern) {
 
 std::string LogFormatter::format(Logger::ptr logger, LogLevel level, LogEvent::ptr event) {
     std::stringstream ss;
-    // std::cout << "m_items.size: " << m_items.size() << std::endl;
+    // std::cout << "std::string LogFormatter::format"  << std::endl;
     for(auto& i: m_items) {
         i->format(ss, logger, level, event);
     }
@@ -191,7 +206,18 @@ public:
         }
     }
     void format(std::ostream& os, Logger::ptr logger, LogLevel level, LogEvent::ptr event) override {
-        os << event->getTime();
+        // 获取时间
+        time_t t = static_cast<time_t>(event->getTime());
+        
+        // 转换为本地时间
+        struct tm local_tm;
+        if(safe_localtime(&t, &local_tm)) {
+            // 使用 strftime 格式化时间
+            char buffer[80];
+            strftime(buffer, 80, m_format.c_str(), &local_tm);
+            os << buffer;
+        }
+        
     }
 private:
     std::string m_format;
@@ -358,10 +384,75 @@ void LogFormatter::init() {
                 m_items.push_back(it->second(std::get<1>(i)));
             }
         }
-        std::cout << "(" << std::get<0>(i) << ") - (" << std::get<1>(i) << ") - (" <<std::get<2>(i) << ")" << std::endl;
+        // std::cout << "(" << std::get<0>(i) << ") - (" << std::get<1>(i) << ") - (" <<std::get<2>(i) << ")" << std::endl;
     }
 
 }
+
+LogEventWrap::LogEventWrap(LogEvent::ptr e): m_event(e) {
+
+}
+
+LogEventWrap::~LogEventWrap() {
+    m_event->getLogger()->log(m_event->getLevel(), m_event);
+}
+
+// 获取日志内容流
+std::stringstream& LogEventWrap::getSS() {
+    return m_event->getSS();
+}
+
+void LogEvent::format(const char* fmt, ...) {
+    va_list al;
+    va_start(al, fmt);
+    format(fmt, al);
+    va_end(al);
+}
+
+void LogEvent::format(const char* fmt, va_list al) {
+    // char* buf = nullptr;
+    // int len = vasprintf(&buf, fmt, al);
+    // if(len != -1) {
+    //     m_ss << std::string(buf, len);
+    //     free(buf);
+    // }
+    va_list args_copy;
+    va_copy(args_copy, al);
+
+    int size = std::vsnprintf(nullptr, 0, fmt, al) + 1; // 获取格式化所需长度
+    if (size <= 0) {
+        va_end(args_copy);
+        return;
+    }
+
+    std::vector<char> buffer(size);
+    std::vsnprintf(buffer.data(), size, fmt, args_copy);
+    va_end(args_copy);
+
+    m_ss << std::string(buffer.data(), size - 1); // 去掉末尾的 '\0'
+}
+
+LoggerManager::LoggerManager() {
+    m_root.reset(new Logger);
+    m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
+    m_loggers[m_root->getName()] = m_root;
+}
+LoggerManager::~LoggerManager() {
+
+}
+
+Logger::ptr LoggerManager::getLogger(const std::string& name) {
+    auto it = m_loggers.find(name);
+    if(it!=m_loggers.end()) {
+        return it->second;
+    }
+
+    Logger::ptr logger(new Logger(name));
+    logger->setRoot(m_root);
+    m_loggers[name] = logger;
+    return logger;
+}
+
 
 
 }

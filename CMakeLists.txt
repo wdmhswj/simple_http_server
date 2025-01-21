@@ -37,19 +37,45 @@ else()
     message(">> unknow compiler.")
 endif()
 
-set(LIB_SRC src/_log/log.cpp)
+set(LIB_SRC 
+    src/_log/log.cpp 
+    src/util/util.cpp
+    )
 
 # 创建共享库
-# add_library(shs SHARED ${LIB_SRC})
-add_library(shs STATIC ${LIB_SRC})
+add_library(shs SHARED ${LIB_SRC})
+set_target_properties(shs PROPERTIES 
+    OUTPUT_NAME "shs"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(shs_static STATIC ${LIB_SRC})
+set_target_properties(shs_static PROPERTIES 
+    OUTPUT_NAME "shs"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+
+target_include_directories(shs PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    )
+# add_library(shs STATIC ${LIB_SRC})
 
 # 创建可执行文件
 add_executable(test tests/test.cpp)
 
-# 设置依赖关系和链接库
-add_dependencies(test shs)
-target_link_libraries(test shs)
+set_target_properties(test PROPERTIES 
+    OUTPUT_NAME "test"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
 
-# 设置输出路径
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+# 设置依赖关系和链接库
+# add_dependencies(test shs)
+target_link_libraries(test PRIVATE shs)
+
+# # 设置输出路径
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+# set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+

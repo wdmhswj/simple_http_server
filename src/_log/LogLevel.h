@@ -12,7 +12,7 @@ enum class LogLevel: uint8_t {
     DEBUG = 1,
     INFO = 2,
     WARN = 3,
-    ERROR = 4,
+    ERROR_ = 4,
     FATAL = 5,
 };
 
@@ -25,7 +25,7 @@ public:
             case LogLevel::DEBUG: return "DEBUG";
             case LogLevel::INFO: return "INFO";
             case LogLevel::WARN: return "WARN";
-            case LogLevel::ERROR: return "ERROR";
+            case LogLevel::ERROR_: return "ERROR";
             case LogLevel::FATAL: return "FATAL";
             default: return "UNKNOWN";
         }
@@ -36,7 +36,7 @@ public:
         if (str == "DEBUG") return LogLevel::DEBUG;
         if (str == "INFO") return LogLevel::INFO;
         if (str == "WARN") return LogLevel::WARN;
-        if (str == "ERROR") return LogLevel::ERROR;
+        if (str == "ERROR") return LogLevel::ERROR_;
         if (str == "FATAL") return LogLevel::FATAL;
         throw std::invalid_argument("Invalid log level string");
     }
