@@ -6,8 +6,8 @@
 #include "LogAppender.h"
 #include "LoggerManager.h"
 #include "macro.h"
-#include "singleton.h"
+// #include "singleton.h"
 
-namespace shs {
-    using LoggerMgr = SingleTonPtr<LoggerManager>;
-}
+// namespace shs {
+    
+// }

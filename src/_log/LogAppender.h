@@ -12,7 +12,8 @@ namespace shs {
 class LogAppender {
 public:
     using ptr = std::shared_ptr<LogAppender>;
-    LogAppender(LogLevel level = LogLevel::DEBUG, LogFormatter::ptr formatter=nullptr);
+    LogAppender(LogLevel level, LogFormatter::ptr formatter);
+    LogAppender() {}
     virtual ~LogAppender() {}                                   // 虚析构函数，使得在使用基类的指针析构时也会先调用派生类的析构函数
 
     virtual void log(Logger::ptr logger, LogLevel level, LogEvent::ptr event) = 0;  // 纯虚函数，子类必须实现
@@ -25,8 +26,8 @@ public:
     void setLevel(LogLevel level) { m_level = level; }
     LogLevel getLevel() const { return m_level; }
 protected:                                                      // 保护模式：public继承的子类还可以直接访问
-    LogLevel m_level;                                           // 日志级别
-    LogFormatter::ptr m_formatter;                              // 输出格式
+    LogLevel m_level = LogLevel::DEBUG;                                           // 日志级别
+    LogFormatter::ptr m_formatter = std::make_shared<LogFormatter>("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");   // 输出格式
 };
 
 

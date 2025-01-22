@@ -32,7 +32,7 @@ LogEvent::LogEvent(Logger::ptr logger, LogLevel level, const std::string& file, 
 Logger::Logger(const std::string& name)
     : m_name(name)
     , m_level(LogLevel::DEBUG) {
-    m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"));
+    // m_formatter.reset(new LogFormatter("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"));
 }
 
 
@@ -81,10 +81,6 @@ void Logger::delAppender(std::shared_ptr<LogAppender> appender) {
 
 
 LogAppender::LogAppender(LogLevel level, LogFormatter::ptr formatter): m_level(level), m_formatter(formatter) {
-    if(m_formatter==nullptr) {
-        m_formatter = std::make_shared<LogFormatter>("%d%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");
-        
-    }
 }
 
 
@@ -92,16 +88,16 @@ LogAppender::LogAppender(LogLevel level, LogFormatter::ptr formatter): m_level(l
 void StdoutLogAppender::log(Logger::ptr logger, LogLevel level, LogEvent::ptr event) {
     // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
     // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
-    if(m_formatter==nullptr) 
-        std::cout << "m_formatter is nullptr" << std::endl;
+    // if(m_formatter==nullptr) 
+    //     std::cout << "m_formatter is nullptr" << std::endl;
     if(level >= m_level)
         std::cout << m_formatter->format(logger, level, event) << std::endl;
 }
 
 void FileLogAppender::log(Logger::ptr logger, LogLevel level, LogEvent::ptr event) {
-    std::cout << "FileLogAppender::log\n";
-    std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
-    std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
+    // std::cout << "FileLogAppender::log\n";
+    // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
+    // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
     if(level >= m_level)
         m_filestream << m_formatter->format(logger, level, event) << std::endl;
 }
@@ -307,7 +303,7 @@ void LogFormatter::init() {
             // 解析花括号内容
             if(fmt_status==0) {
                 if(m_pattern[n]=='{') {
-                    str = m_pattern.substr(i+1, n-i-i);
+                    str = m_pattern.substr(i+1, n-i-1);
                     fmt_status = 1; // 开始解析花括号中的格式化项
                     fmt_begin = n;
                     ++n;

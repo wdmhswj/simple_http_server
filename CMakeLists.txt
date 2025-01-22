@@ -37,45 +37,94 @@ else()
     message(">> unknow compiler.")
 endif()
 
-set(LIB_SRC 
+set(LIB_SRC_LOG 
     src/_log/log.cpp 
     src/util/util.cpp
-    )
+)
 
 # 创建共享库
-add_library(shs SHARED ${LIB_SRC})
-set_target_properties(shs PROPERTIES 
-    OUTPUT_NAME "shs"
+add_library(log SHARED ${LIB_SRC_LOG})
+set_target_properties(log PROPERTIES 
+    OUTPUT_NAME "log"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
 
-add_library(shs_static STATIC ${LIB_SRC})
-set_target_properties(shs_static PROPERTIES 
-    OUTPUT_NAME "shs"
+add_library(log_static STATIC ${LIB_SRC_LOG})
+set_target_properties(log_static PROPERTIES 
+    OUTPUT_NAME "log_static"
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
 )
 
 
-target_include_directories(shs PRIVATE 
+target_include_directories(log PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/_log
     ${CMAKE_SOURCE_DIR}/src/util
-    )
-# add_library(shs STATIC ${LIB_SRC})
+)
+
+target_include_directories(log_static PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+)
+
+
+
+set(LIB_SRC_CONFIG 
+    src/config/config.cpp
+)
+
+# 创建共享库
+add_library(config SHARED ${LIB_SRC_CONFIG})
+set_target_properties(config PROPERTIES 
+    OUTPUT_NAME "config"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(config_static STATIC ${LIB_SRC_CONFIG})
+set_target_properties(config_static PROPERTIES 
+    OUTPUT_NAME "config_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+
+target_include_directories(config
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    PUBLIC
+    "D:\\libs\\boost_1_87_0"
+)
+
+target_include_directories(config_static
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    PUBLIC
+    "D:\\libs\\boost_1_87_0"
+)
+
 
 # 创建可执行文件
 add_executable(test tests/test.cpp)
-
+target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/src/_log)
 set_target_properties(test PROPERTIES 
     OUTPUT_NAME "test"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
+target_link_libraries(test PRIVATE log)
 
-# 设置依赖关系和链接库
-# add_dependencies(test shs)
-target_link_libraries(test PRIVATE shs)
 
-# # 设置输出路径
-# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-# set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test_config tests/test_config.cpp)
+target_include_directories(test_config PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/config
+    ${CMAKE_SOURCE_DIR}/src/_log
+)
+set_target_properties(test_config PROPERTIES 
+    OUTPUT_NAME "test_config"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+target_link_libraries(test_config PRIVATE config log)
+
+
 
 

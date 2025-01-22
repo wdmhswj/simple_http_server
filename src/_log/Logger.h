@@ -38,7 +38,7 @@ public:
 private:
     std::string m_name;                         // 日志名称
     LogLevel m_level;                           // 日志级别
-    std::shared_ptr<LogFormatter> m_formatter;              // 日志格式器
+    // std::shared_ptr<LogFormatter> m_formatter;              // 日志格式器
     // std::shared_ptr<LogAppender> m_appender;
     std::list<std::shared_ptr<LogAppender>> m_appenders;    // Appender 集合
     Logger::ptr m_root;                                     // 主日志器

@@ -3,6 +3,8 @@
 #include <ctime>
 #include <string>
 #include <sstream>
+#include <typeinfo>
+#include <cxxabi.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -25,6 +27,10 @@ std::string GetThreadId();
 // 返回当前协程的ID
 uint64_t GetFiberId();
 
-
+template<class T>
+const char* TypeToName() {
+    static const char* s_name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+    return s_name;
+}
 
 }
