@@ -115,16 +115,26 @@ target_link_libraries(test PRIVATE log)
 
 
 add_executable(test_config tests/test_config.cpp)
+target_compile_definitions(test_config PRIVATE YAML_CPP_STATIC_DEFINE)
 target_include_directories(test_config PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/config
     ${CMAKE_SOURCE_DIR}/src/_log
+    "D:\\libs\\yaml-cpp-0.8.0\\include"
 )
+
+target_link_directories(test_config PRIVATE 
+    "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+
 set_target_properties(test_config PROPERTIES 
     OUTPUT_NAME "test_config"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
-target_link_libraries(test_config PRIVATE config log)
 
-
+target_link_libraries(test_config PRIVATE
+    config
+    log
+    yaml-cpp
+)
 
 

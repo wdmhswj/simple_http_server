@@ -18,3 +18,10 @@
 - [x] #define SYLAR_LOG_ROOT
 - [x] test_config 测试
 
+## 2025/2/5: 配置系统02_yaml
+- [x] 理解配置系统到底是什么：将项目的一些配置写入yaml文件，通过yaml-cpp库读取配置文件并解析，日志系统可以辅助打印加载的配置信息
+- [x] 学习yaml格式
+- [x] 安装/使用C++库：yaml-cpp, `cmake -DCMAKE_INSTALL_PREFIX=D:\libs\yaml-cpp-0.8.0 -G "MinGW Makefiles" ..`，`cmake --build . --target install`
+- [x] bin/conf/log.yml
+- [x] test_config.cpp: test_yaml()
+
