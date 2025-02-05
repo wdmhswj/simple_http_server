@@ -6,6 +6,8 @@
 #include <boost/lexical_cast.hpp>
 #include "../_log/macro.h"
 #include "../util/util.h"
+#include <yaml-cpp/yaml.h>
+// #include <iostream>
 
 namespace shs {
 // 配置变量的基类
@@ -13,6 +15,7 @@ class ConfigVarBase {
 public:
     using ptr = std::shared_ptr<ConfigVarBase>;
     ConfigVarBase(const std::string& name, const std::string& description=""): m_name(name), m_description(description){
+        std::transform(m_name.begin(), m_name.end(), m_name.begin(), ::tolower);
     }
 
     virtual ~ConfigVarBase() {}
@@ -76,12 +79,14 @@ public:
             return tmp;
         }
 
-        if(name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._1234567890") != name.npos) {
+        if(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz._1234567890") != name.npos) {
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Lookup name invalid " << name;
             throw std::invalid_argument(name);
         }
 
-        return std::make_shared<ConfigVar<T>>(default_value, name, description);
+        auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
+        m_datas[name] = ptr;
+        return ptr;
     }
 
     template<typename T>
@@ -93,6 +98,17 @@ public:
         return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
     }
     
+    // 使用 YAML::Node 初始化配置模块
+    static void LoadFromYaml(const YAML::Node& root);
+    // 查询配置参数，返回配置参数的基类
+    static ConfigVarBase::ptr LookupBase(const std::string& name);
+
+    // static void debug() {
+    //     std::cout << "m_datas: size=" << m_datas.size() << "\n";
+    //     for(const auto& i: m_datas) {
+    //         std::cout << "\t" << i.first << std::endl;
+    //     }
+    // }
 private:
     static ConfigVarMap m_datas;
 };

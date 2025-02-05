@@ -25,3 +25,9 @@
 - [x] bin/conf/log.yml
 - [x] test_config.cpp: test_yaml()
 
+## 2025/2/5: 配置系统03_yaml整合
+- [x] ConfigVarBase m_name 大小写
+- [x] LoadFromYaml()
+- [x] ConfigVarBase Config::LookupBase()
+- [x] void test_config()
+- [x] log.yaml

@@ -90,6 +90,7 @@ target_include_directories(config
     PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/_log
     ${CMAKE_SOURCE_DIR}/src/util
+    "D:\\libs\\yaml-cpp-0.8.0\\include"
     PUBLIC
     "D:\\libs\\boost_1_87_0"
 )
@@ -98,10 +99,29 @@ target_include_directories(config_static
     PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/_log
     ${CMAKE_SOURCE_DIR}/src/util
+    "D:\\libs\\yaml-cpp-0.8.0\\include"
     PUBLIC
     "D:\\libs\\boost_1_87_0"
 )
 
+target_link_directories(config PRIVATE 
+    "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+target_link_directories(config_static PRIVATE 
+    "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+target_link_libraries(config
+    PRIVATE
+    yaml-cpp
+    log
+)
+target_link_libraries(config_static
+    PRIVATE
+    yaml-cpp
+    log
+)
+target_compile_definitions(config PRIVATE YAML_CPP_STATIC_DEFINE)
+target_compile_definitions(config_static PRIVATE YAML_CPP_STATIC_DEFINE)
 
 # 创建可执行文件
 add_executable(test tests/test.cpp)
@@ -110,7 +130,7 @@ set_target_properties(test PROPERTIES
     OUTPUT_NAME "test"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
-target_link_libraries(test PRIVATE log)
+target_link_libraries(test PRIVATE log_static)
 
 
 
@@ -132,8 +152,8 @@ set_target_properties(test_config PROPERTIES
 )
 
 target_link_libraries(test_config PRIVATE
-    config
-    log
+    config_static
+    log_static
     yaml-cpp
 )
 

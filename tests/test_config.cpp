@@ -31,11 +31,20 @@ void test_yaml() {
     YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
     print_yaml(root, 0);
 }
+void test_config() {
+    // shs::Config::debug();
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_int_value_config->getValue();
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_double_value_config->toString();
+    // shs::Config::debug();
+    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    shs::Config::LoadFromYaml(root);
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_int_value_config->getValue();
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_double_value_config->toString();
 
+}
 int main(int argc, char** argv) {
-    SHS_LOG_INFO(SHS_LOG_ROOT()) << g_int_value_config->getValue();
-    SHS_LOG_INFO(SHS_LOG_ROOT()) << g_double_value_config->toString();
 
-    test_yaml();
+    // test_yaml();
+    test_config();
     return 0;
 }
