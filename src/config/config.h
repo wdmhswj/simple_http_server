@@ -207,6 +207,37 @@ public:
     }
 };
 
+template<typename T>
+class Lexical_cast<std::string, std::unordered_map<std::string, T>> {
+public:
+    std::unordered_map<std::string, T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::unordered_map<std::string, T> res;
+        std::stringstream ss;
+        for(auto it=node.begin(); it!=node.end(); ++it) {
+            ss.str("");
+            ss << it->second;
+            res.insert(std::make_pair(it->first.Scalar(), Lexical_cast<std::string, T>()(ss.str())));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::unordered_map<std::string, T>, std::string> {
+public:
+    std::string operator()(const std::unordered_map<std::string, T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node[i.first] = YAML::Load(Lexical_cast<T, std::string>()(i.second));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
 template<typename T, typename FromStr = Lexical_cast<std::string, T>, typename ToStr = Lexical_cast<T, std::string>>
 class ConfigVar: public ConfigVarBase {
 public:
@@ -232,7 +263,7 @@ public:
             m_val = FromStr()(val);
             return true;
         } catch(std::exception& e) {    
-            SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::fromString exception " << e.what() << " convert: string to" << typeid(m_val).name();
+            SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::fromString exception " << e.what() << " convert: string to" << TypeToName<T>() << " name=" << getName() << " - " << val; 
         }
         return false;
     } 
@@ -250,20 +281,34 @@ public:
 
     template<typename T>
     static typename ConfigVar<T>::ptr Lookup(const T& default_value, const std::string& name, const std::string& description="") {
+        auto it = m_datas.find(name);
+        if(it != m_datas.end()) {
+            auto ptr = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
+            if(ptr) {
+                SHS_LOG_INFO(SHS_LOG_ROOT()) << "Looup name: " << name << " exists";
+                return ptr;
+            } else {
+                SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Lookup name=" << name << " exists but type not "
+                        << TypeToName<T>() << " real_type=" << it->second->getTypeName()
+                        << " " << it->second->toString();
+                return nullptr;
+            }
+        } else {
+            if(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz._1234567890") != name.npos) {
+                SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Lookup name invalid " << name;
+                throw std::invalid_argument(name);
+            }
+
+            auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
+            m_datas[name] = ptr;
+            return ptr;
+        }
         auto tmp = Lookup<T>(name);
         if(tmp) {
             SHS_LOG_INFO(SHS_LOG_ROOT()) << "Looup name: " << name << " exists";
             return tmp;
         }
 
-        if(name.find_first_not_of("abcdefghijklmnopqrstuvwxyz._1234567890") != name.npos) {
-            SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Lookup name invalid " << name;
-            throw std::invalid_argument(name);
-        }
-
-        auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
-        m_datas[name] = ptr;
-        return ptr;
     }
 
     template<typename T>

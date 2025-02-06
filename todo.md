@@ -36,3 +36,6 @@
 - [x] FromStr/ToStr，支持vector类型的配置
 - [x] 更多stl容器的支持: list/map/unordered_map/set/unordered_set
 - [x] test_config: #define XX
+- [x] 解决key相同value类型不同时不会报错的问题
+- [x] 自定义类型解析: 直接class，map< str, Person>, vector<Person>
+- [x] fromString() catch 报错内容添加
