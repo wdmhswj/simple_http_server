@@ -31,3 +31,6 @@
 - [x] ConfigVarBase Config::LookupBase()
 - [x] void test_config()
 - [x] log.yaml
+
+## 2025/2/6: 配置系统04_复杂类型的支持
+- [x] FromStr/ToStr，支持vector类型的配置

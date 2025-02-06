@@ -9,7 +9,9 @@ Logger(定义日志类别)
 Formatter(定义日志格式)
 Appender(日志输出的地方)
 ```
-
+## 配置系统模块
+- 原则：
+  - 约定优于配置
 ## 知识点
 - std::enable_shared_from_this
 - 宏定义 与 inline
@@ -32,6 +34,7 @@ Appender(日志输出的地方)
 - VA_ARGS 宏定义，用于宏定义中的可变参数列表，它可以让宏接受任意数量的参数
 - typeid 运算符：获取一个表达式的类型信息，头文件 <typeinfo>
 - std::dynamic_pointer_cast<> 用于将基类的智能指针转化为子类的智能指针（std::shared_ptr）
+- std::stringstream 对象内容的清空应使用 str("") 方法，而不是 clear() (clear只是重置流对象的状态，)
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）
 - [ ] 减少日志模块的耦合度

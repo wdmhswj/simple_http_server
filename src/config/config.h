@@ -33,6 +33,47 @@ private:
     std::string m_description;
 };
 
+// F: From_type, T: To_type
+template<typename F, typename T>
+class Lexical_cast {
+public:
+    T operator()(const F& f) {
+        return boost::lexical_cast<T>(f);
+    }
+};
+
+// Lexical_cast 偏特化
+template<typename T>
+class Lexical_cast<std::string, std::vector<T>> {
+public:
+    std::vector<T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::vector<T> res;
+        std::stringstream ss;
+        for(size_t i=0; i<node.size(); ++i) {
+            ss.str("");
+            ss << node[i];
+            res.push_back(Lexical_cast<std::string, T>()(ss.str()));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::vector<T>, std::string> {
+public:
+    std::string operator()(const std::vector<T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node.push_back(YAML::Load(Lexical_cast<T, std::string>()(i)));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
 
 template<typename T>
 class ConfigVar: public ConfigVarBase {
@@ -43,7 +84,8 @@ public:
 
     std::string toString() override {
         try {
-            return boost::lexical_cast<std::string>(m_val);
+            // return boost::lexical_cast<std::string>(m_val);
+            return Lexical_cast<T, std::string>()(m_val);
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::toString exception " << e.what() << " convert: " << typeid(m_val).name() << " to string";
         }
@@ -52,7 +94,8 @@ public:
 
     bool fromString(const std::string& val) override {
         try {
-            m_val = boost::lexical_cast<T>(val);
+            // m_val = boost::lexical_cast<T>(val);
+            m_val = Lexical_cast<std::string, T>()(val);
             return true;
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::fromString exception " << e.what() << " convert: string to" << typeid(m_val).name();
