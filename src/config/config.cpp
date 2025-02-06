@@ -6,7 +6,9 @@
 
 namespace shs {
 
-Config::ConfigVarMap Config::m_datas;
+// Config::ConfigVarMap Config::m_datas;
+// std::mutex Config::m_mutex;
+// Config::ConfigVarMap Config::m_datas;
 
 // "A.B", 10
 // A:
@@ -57,8 +59,8 @@ void Config::LoadFromYaml(const YAML::Node& root) {
 }
 // 查询配置参数，返回配置参数的基类
 ConfigVarBase::ptr Config::LookupBase(const std::string& name) {
-    auto it = m_datas.find(name);
-    return it==m_datas.end() ? nullptr : it->second;
+    auto it = GetDatas().find(name);
+    return it==GetDatas().end() ? nullptr : it->second;
 }
 
 

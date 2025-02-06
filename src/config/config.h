@@ -12,6 +12,8 @@
 #include <unordered_set>
 #include <map>
 #include <unordered_map>
+#include <mutex>
+#include <iostream>
 
 namespace shs {
 // 配置变量的基类
@@ -281,8 +283,9 @@ public:
 
     template<typename T>
     static typename ConfigVar<T>::ptr Lookup(const T& default_value, const std::string& name, const std::string& description="") {
-        auto it = m_datas.find(name);
-        if(it != m_datas.end()) {
+
+        auto it = GetDatas().find(name);
+        if(it != GetDatas().end()) {
             auto ptr = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
             if(ptr) {
                 SHS_LOG_INFO(SHS_LOG_ROOT()) << "Looup name: " << name << " exists";
@@ -299,22 +302,32 @@ public:
                 throw std::invalid_argument(name);
             }
 
+            // auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
             auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
-            m_datas[name] = ptr;
+            if (!ptr) {
+                SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Generated ptr is nullptr for " << name;
+                return nullptr;
+            }
+
+            try {
+                auto result = GetDatas().insert({name, ptr});
+                if (!result.second) {
+                    SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Failed to insert new config var";
+                    return nullptr;
+                }
+            } catch (const std::exception& e) {
+                SHS_LOG_ERROR(SHS_LOG_ROOT()) << "Exception during insertion: " << e.what() << std::endl;
+                return nullptr;
+            }
             return ptr;
-        }
-        auto tmp = Lookup<T>(name);
-        if(tmp) {
-            SHS_LOG_INFO(SHS_LOG_ROOT()) << "Looup name: " << name << " exists";
-            return tmp;
         }
 
     }
 
     template<typename T>
     static typename ConfigVar<T>::ptr Lookup(const std::string& name) {
-        auto it = m_datas.find(name);
-        if(it == m_datas.end()) {
+        auto it = GetDatas().find(name);
+        if(it == GetDatas().end()) {
             return nullptr;
         }
         return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
@@ -325,6 +338,11 @@ public:
     // 查询配置参数，返回配置参数的基类
     static ConfigVarBase::ptr LookupBase(const std::string& name);
 
+    static ConfigVarMap& GetDatas() {
+        static ConfigVarMap s_datas;
+        return s_datas;
+    }
+
     // static void debug() {
     //     std::cout << "m_datas: size=" << m_datas.size() << "\n";
     //     for(const auto& i: m_datas) {
@@ -332,7 +350,9 @@ public:
     //     }
     // }
 private:
-    static ConfigVarMap m_datas;
+    // static std::mutex m_mutex;  // 添加互斥锁
+
+    // static ConfigVarMap m_datas;
 };
 
 

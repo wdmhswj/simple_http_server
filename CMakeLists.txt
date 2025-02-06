@@ -85,6 +85,63 @@ set_target_properties(config_static PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
 )
 
+# 判断平台
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+message(">> Platform: Windows")
+
+target_include_directories(config
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    "D:\\libs\\yaml-cpp-0.8.0\\include"
+    PUBLIC
+    "D:\\libs\\boost_1_87_0"
+)
+
+target_include_directories(config_static
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    "D:\\libs\\yaml-cpp-0.8.0\\include"
+    PUBLIC
+    "D:\\libs\\boost_1_87_0"
+)
+
+target_link_directories(config PRIVATE 
+    "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+target_link_directories(config_static PRIVATE 
+    "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+message(">> Platform: Linux")
+
+target_include_directories(config
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    # "D:\\libs\\yaml-cpp-0.8.0\\include"
+    PUBLIC
+)
+
+target_include_directories(config_static
+    PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+    ${CMAKE_SOURCE_DIR}/src/util
+    # "D:\\libs\\yaml-cpp-0.8.0\\include"
+    PUBLIC
+)
+
+target_link_directories(config PRIVATE 
+    # "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+target_link_directories(config_static PRIVATE 
+    # "D:\\libs\\yaml-cpp-0.8.0\\lib"
+)
+
+else()
+    message(">> unknow.")
+endif()
 
 target_include_directories(config
     PRIVATE 

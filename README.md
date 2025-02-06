@@ -46,6 +46,35 @@ Lexical_cast;
 - typeid 运算符：获取一个表达式的类型信息，头文件 <typeinfo>
 - std::dynamic_pointer_cast<> 用于将基类的智能指针转化为子类的智能指针（std::shared_ptr）
 - std::stringstream 对象内容的清空应使用 str("") 方法，而不是 clear() (clear只是重置流对象的状态，)
+- CMake库文件安装：`cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr/local`, `cmake --build . --target install`
+- 在全局构造函数中使用 Lookup 可能导致静态初始化顺序问题。需要使用 Meyer's Singleton 模式来解决：
+```cpp
+class Config {
+public:
+    using ConfigVarMap = std::map<std::string, ConfigVarBase::ptr>;
+    
+    static ConfigVarMap& GetDatas() {
+        static ConfigVarMap s_datas;
+        return s_datas;
+    }
+    
+    template<typename T>
+    static typename ConfigVar<T>::ptr Lookup(const T& default_value, 
+                                           const std::string& name,
+                                           const std::string& description="") 
+    {
+        auto& m_datas = GetDatas();  // 使用局部静态变量
+        auto it = m_datas.find(name);
+        if(it != m_datas.end()) {
+            // ... 剩余代码不变
+        }
+        auto ptr = std::make_shared<ConfigVar<T>>(default_value, name, description);
+        m_datas.emplace(name, ptr);
+        return ptr;
+    }
+};
+```
+
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）
 - [ ] 减少日志模块的耦合度
