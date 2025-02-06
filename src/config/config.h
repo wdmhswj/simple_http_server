@@ -7,7 +7,11 @@
 #include "../_log/macro.h"
 #include "../util/util.h"
 #include <yaml-cpp/yaml.h>
-// #include <iostream>
+#include <list>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <unordered_map>
 
 namespace shs {
 // 配置变量的基类
@@ -76,6 +80,134 @@ public:
 };
 
 template<typename T>
+class Lexical_cast<std::string, std::list<T>> {
+public:
+    std::list<T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::list<T> res;
+        std::stringstream ss;
+        for(size_t i=0; i<node.size(); ++i) {
+            ss.str("");
+            ss << node[i];
+            res.push_back(Lexical_cast<std::string, T>()(ss.str()));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::list<T>, std::string> {
+public:
+    std::string operator()(const std::list<T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node.push_back(YAML::Load(Lexical_cast<T, std::string>()(i)));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::string, std::set<T>> {
+public:
+    std::set<T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::set<T> res;
+        std::stringstream ss;
+        for(size_t i=0; i<node.size(); ++i) {
+            ss.str("");
+            ss << node[i];
+            res.insert(Lexical_cast<std::string, T>()(ss.str()));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::set<T>, std::string> {
+public:
+    std::string operator()(const std::set<T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node.push_back(YAML::Load(Lexical_cast<T, std::string>()(i)));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::string, std::unordered_set<T>> {
+public:
+    std::unordered_set<T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::unordered_set<T> res;
+        std::stringstream ss;
+        for(size_t i=0; i<node.size(); ++i) {
+            ss.str("");
+            ss << node[i];
+            res.insert(Lexical_cast<std::string, T>()(ss.str()));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::unordered_set<T>, std::string> {
+public:
+    std::string operator()(const std::unordered_set<T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node.push_back(YAML::Load(Lexical_cast<T, std::string>()(i)));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::string, std::map<std::string, T>> {
+public:
+    std::map<std::string, T> operator()(const std::string& f) {
+        // str -> yaml::node -> Lexical_cast<str, T> -> vec<T>
+        auto node = YAML::Load(f);
+        typename std::map<std::string, T> res;
+        std::stringstream ss;
+        for(auto it=node.begin(); it!=node.end(); ++it) {
+            ss.str("");
+            ss << it->second;
+            res.insert(std::make_pair(it->first.Scalar(), Lexical_cast<std::string, T>()(ss.str())));
+        }
+        return res;
+    }
+};
+
+template<typename T>
+class Lexical_cast<std::map<std::string, T>, std::string> {
+public:
+    std::string operator()(const std::map<std::string, T>& f) {
+        // vec<T> -> Lexical_cast<T, str> -> node -> str
+        YAML::Node node;
+        for(const auto& i: f) {
+            node[i.first] = YAML::Load(Lexical_cast<T, std::string>()(i.second));
+        }
+        std::stringstream ss;
+        ss << node;
+        return ss.str();
+    }
+};
+
+template<typename T, typename FromStr = Lexical_cast<std::string, T>, typename ToStr = Lexical_cast<T, std::string>>
 class ConfigVar: public ConfigVarBase {
 public:
     using ptr = std::shared_ptr<ConfigVar>;
@@ -85,7 +217,8 @@ public:
     std::string toString() override {
         try {
             // return boost::lexical_cast<std::string>(m_val);
-            return Lexical_cast<T, std::string>()(m_val);
+            // return Lexical_cast<T, std::string>()(m_val);
+            return ToStr()(m_val);
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::toString exception " << e.what() << " convert: " << typeid(m_val).name() << " to string";
         }
@@ -95,7 +228,8 @@ public:
     bool fromString(const std::string& val) override {
         try {
             // m_val = boost::lexical_cast<T>(val);
-            m_val = Lexical_cast<std::string, T>()(val);
+            // m_val = Lexical_cast<std::string, T>()(val);
+            m_val = FromStr()(val);
             return true;
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::fromString exception " << e.what() << " convert: string to" << typeid(m_val).name();

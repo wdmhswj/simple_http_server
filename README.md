@@ -10,8 +10,19 @@ Formatter(定义日志格式)
 Appender(日志输出的地方)
 ```
 ## 配置系统模块
-- 原则：
-  - 约定优于配置
+原则：约定优于配置
+```cpp
+template<class T, class FromStr, class ToStr>
+class ConfigVar;
+
+template<class F, class T>
+Lexical_cast;
+
+// 容器偏特化，目前支持：
+//                  vector, list, set, map, unordered_map, set, unordered_set
+// map/unordered_map 支持 key=std::string
+// Config::Lookup(key), key 相同，类型不同的，不会报错，这个需要后面处理
+```
 ## 知识点
 - std::enable_shared_from_this
 - 宏定义 与 inline

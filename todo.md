@@ -32,5 +32,7 @@
 - [x] void test_config()
 - [x] log.yaml
 
-## 2025/2/6: 配置系统04_复杂类型的支持
+## 2025/2/6: 配置系统
 - [x] FromStr/ToStr，支持vector类型的配置
+- [x] 更多stl容器的支持: list/map/unordered_map/set/unordered_set
+- [x] test_config: #define XX
