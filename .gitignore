@@ -13,7 +13,7 @@ CMakeUserPresets.json
 
 build/
 lib/
-bin/
+bin/*
 .vscode/
 # 但是不要忽略 bin/conf 目录及其中的文件
 !bin/conf/

@@ -1,0 +1,81 @@
+logs:
+    - name: root
+      level: info
+      appenders:
+          - type: FileLogAppender
+            file: D:/test/test_for_shs/logs/sylar/root.txt
+          - type: StdoutLogAppender
+    - name: system
+      level: info
+      appenders:
+          - type: FileLogAppender
+            file: D:/test/test_for_shs/logs/sylar/system.txt
+          - type: StdoutLogAppender
+system:
+  port: 7777
+  call: 23423.332
+  vec:
+    - 232423
+    - 345634
+  list:
+    - 232423
+    - 345634
+  set:
+    - 232423
+    - 345634
+  uset:
+    - 232423
+    - 345634
+  map:
+    k: 2
+    w: 3
+  umap:
+    k: 2
+    w: 3
+
+class:
+  person:
+    name: shs
+    age: 22
+    sex: true
+  map:
+    a:
+      name: shs
+      age: 22
+      sex: true
+    b: 
+      name: shs
+      age: 22
+      sex: true
+  vec_map:
+    c:
+      - name: shs
+        age: 22
+        sex: true
+      - name: shs
+        age: 22
+        sex: true
+      - name: shs
+        age: 22
+        sex: true
+    d:
+      - name: shs
+        age: 22
+        sex: true
+      - name: shs
+        age: 22
+        sex: true
+  list_person:
+    - name: shs
+      age: 22
+      sex: true
+    - name: shs
+      age: 22
+      sex: true
+    - name: shs
+      age: 22
+      sex: true
+    - name: shs
+      age: 22
+      sex: true
+    
