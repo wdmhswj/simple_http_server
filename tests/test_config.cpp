@@ -4,11 +4,6 @@
 #include <yaml-cpp/yaml.h>
 #include "../src/util/util.h"
 
-#ifdef PLATFORM_WINDOWS
-    std::cout << "Running on Windows" << std::endl;
-#endif
-
-
 #if 1
 shs::ConfigVar<int>::ptr g_int_value_config = shs::Config::Lookup((int)8080, "system.port", "system.port description");
 shs::ConfigVar<float>::ptr g_fint_value_config = shs::Config::Lookup((float)8080, "system.port", "system.port description");
