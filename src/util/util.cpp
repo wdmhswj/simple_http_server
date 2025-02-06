@@ -38,6 +38,14 @@ uint64_t GetFiberId() {
     return 0;
 }
 
+std::string chooseByOs(const std::string& win, const std::string& linux) {
+    #ifdef PLATFORM_WINDOWS
+        return win;
+    #elif defined(PLATFORM_LINUX)
+        return linux;
+    #endif
+        return "";
 
+}
 
 }

@@ -33,4 +33,6 @@ const char* TypeToName() {
     return s_name;
 }
 
+std::string chooseByOs(const std::string& win, const std::string& linux);
+
 }

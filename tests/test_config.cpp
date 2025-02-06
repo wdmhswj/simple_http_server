@@ -2,6 +2,12 @@
 #include "../src/_log/log.h"
 // #include <iostream>
 #include <yaml-cpp/yaml.h>
+#include "../src/util/util.h"
+
+#ifdef PLATFORM_WINDOWS
+    std::cout << "Running on Windows" << std::endl;
+#endif
+
 
 #if 1
 shs::ConfigVar<int>::ptr g_int_value_config = shs::Config::Lookup((int)8080, "system.port", "system.port description");
@@ -37,7 +43,7 @@ void print_yaml(const YAML::Node& node, int level) {
 
 void test_yaml() {
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
     print_yaml(root, 0);
 }
 void test_config() {
@@ -70,7 +76,7 @@ void test_config() {
     XXM(g_umap_int_value_config, umap_int, before);
     // shs::Config::debug();
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
     shs::Config::LoadFromYaml(root);
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_int_value_config->getValue();
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_double_value_config->toString();
@@ -180,7 +186,7 @@ void test_class() {
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_list_person->toString();
 
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile("../bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
     shs::Config::LoadFromYaml(root);
 
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_person->getValue().toString() << " - " << g_person->toString();
