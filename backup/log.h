@@ -16,7 +16,7 @@ class LogEvent;
 
 // 日志级别
 enum class LogLevel: uint8_t {
-    UNKOWNN = 0, // 未知级别
+    UNKNOW = 0, // 未知级别
     DEBUG = 1,
     INFO = 2,
     WARN = 3,
@@ -99,7 +99,7 @@ class LogLevelHelper {
 public:
     static std::string to_string(LogLevel level) {
         switch(level) {
-            case LogLevel::UNKOWNN: return "UNKOWNN";
+            case LogLevel::UNKNOW: return "UNKNOW";
             case LogLevel::DEBUG: return "DEBUG";
             case LogLevel::INFO: return "INFO";
             case LogLevel::WARN: return "WARN";
@@ -110,7 +110,7 @@ public:
     }
 
     static LogLevel from_string(const std::string& str) {
-        if (str == "UNKOWNN") return LogLevel::UNKOWNN;
+        if (str == "UNKNOW") return LogLevel::UNKNOW;
         if (str == "DEBUG") return LogLevel::DEBUG;
         if (str == "INFO") return LogLevel::INFO;
         if (str == "WARN") return LogLevel::WARN;

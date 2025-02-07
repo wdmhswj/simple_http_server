@@ -13,6 +13,7 @@
 #include "LogLevel.h"
 #include "LoggerManager.h"
 #include "../util/util.h"
+#include "../config/config.h"
 
 namespace shs {
 
@@ -40,10 +41,14 @@ void Logger::log(LogLevel level, std::shared_ptr<LogEvent> event) {
     // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
     // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
     if(level>=m_level) {
-        for(auto& a: m_appenders) {
-            // std::cout << "test1" << std::endl;
-            auto self = shared_from_this();
-            a->log(self, level, event);
+        if(!m_appenders.empty()) {
+            for(auto& a: m_appenders) {
+                // std::cout << "test1" << std::endl;
+                auto self = shared_from_this();
+                a->log(self, level, event);
+            }
+        } else if(m_root) {
+            m_root->log(level, event);  // 若 m_appenders 为空，则调用 m_root->log()
         }
     }
 }
@@ -444,11 +449,74 @@ Logger::ptr LoggerManager::getLogger(const std::string& name) {
     }
 
     Logger::ptr logger(new Logger(name));
-    logger->setRoot(m_root);
-    m_loggers[name] = logger;
+    logger->setRoot(m_root);                // 设置logger对象的root为LoggerManager的m_root
+    m_loggers[name] = logger;               // 注册 logger
     return logger;
 }
 
+struct LogAppenderDefine {
+    int type = 0; //1 File, 2 Stdout
+    LogLevel level = LogLevel::UNKNOW;
+    std::string formatter;
+    std::string file;
+
+    bool operator==(const LogAppenderDefine& oth) const {
+        return type == oth.type
+            && level == oth.level
+            && formatter == oth.formatter
+            && file == oth.file;
+    }
+};
+
+struct LogDefine {
+    std::string name;
+    LogLevel level = LogLevel::UNKNOW;
+    std::string formatter;
+    std::vector<LogAppenderDefine> appenders;
+
+    bool operator==(const LogDefine& oth) const {
+        return name == oth.name
+            && level == oth.level
+            && formatter == oth.formatter
+            && appenders == appenders;
+    }
+
+    bool operator<(const LogDefine& oth) const {
+        return name < oth.name;
+    }
+
+    bool isValid() const {
+        return !name.empty();
+    }
+};
+
+// Lexical_cast: LogDefine 与 std::string 相互的之间转换的偏特化
+template<>
+class Lexical_cast<std::string, LogDefine> {
+public:
+    LogDefine operator()(const std::string& f) {
+        return {};
+    }
+};
+
+template<>
+class Lexical_cast<LogDefine, std::string> {
+public:
+    std::string operator()(const LogDefine& f) {
+        return {};
+    }
+};
+
+ConfigVar<std::set<LogDefine>>::ptr g_log_defines = Config::Lookup(std::set<LogDefine>(), "logs", "logs config");
+
+struct LogIniter
+{
+    LogIniter() {
+
+    }
+};
+
+static LogIniter __log_init;
 
 
 }

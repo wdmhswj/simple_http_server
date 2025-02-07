@@ -1,4 +1,6 @@
 #pragma once 
+#include <cstdint>
+#include <functional>
 #include <string>
 #include <memory>
 #include <typeinfo>
@@ -14,6 +16,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <iostream>
+#include "../_log/log.h"
 
 namespace shs {
 // 配置变量的基类
@@ -244,6 +247,7 @@ template<typename T, typename FromStr = Lexical_cast<std::string, T>, typename T
 class ConfigVar: public ConfigVarBase {
 public:
     using ptr = std::shared_ptr<ConfigVar>;
+    using on_change_cb = std::function<void (const T& old_value, const T& new_value)>;
 
     ConfigVar(const T& default_value, const std::string& name, const std::string& description=""): ConfigVarBase(name, description), m_val(default_value) {}
 
@@ -262,7 +266,8 @@ public:
         try {
             // m_val = boost::lexical_cast<T>(val);
             // m_val = Lexical_cast<std::string, T>()(val);
-            m_val = FromStr()(val);
+            // m_val = FromStr()(val);
+            setValue(FromStr()(val));   // 应使用 setValue() 函数以触发回调函数，而不是直接操作 m_val
             return true;
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::fromString exception " << e.what() << " convert: string to" << TypeToName<T>() << " name=" << getName() << " - " << val; 
@@ -271,10 +276,34 @@ public:
     } 
     std::string getTypeName() const override { return TypeToName<T>();}
     const T getValue() const { return m_val; }
-    void setValue(const T& val) { m_val = val; }
+    void setValue(const T& val) {
+        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "setValue()";
+        if(m_val == val) 
+            return;
+        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "m_cbs.size(): " << m_cbs.size();
+        for(auto& i: m_cbs) {
+            i.second(m_val, val);
+        }
+        m_val = val;
+    }
 
+    void addListener(uint64_t key, on_change_cb cb) {
+        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "addListener()";
+        m_cbs.insert({key, cb});    // insert 需要 key 原本不存在才会添加
+    }
+
+    void delListener(uint64_t key) {
+        m_cbs.erase(key);   // 若 key 不存在，不会产生异常，会返回0
+    }
+
+    on_change_cb getListener(uint64_t key) {
+        auto it = m_cbs.find(key);
+        return it==m_cbs.end() ? nullptr : it->second;
+    }
 private:
     T m_val;
+    // 变更回调函数组, uint64_t key,要求唯一，一般可以用hash
+    std::map<uint64_t, on_change_cb> m_cbs;
 };
 
 class Config {

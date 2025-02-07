@@ -23,6 +23,31 @@ Lexical_cast;
 // map/unordered_map 支持 key=std::string
 // Config::Lookup(key), key 相同，类型不同的，不会报错，这个需要后面处理
 ```
+自定义类型，需要实现 shs::Lexical_cast,偏特化，实现后就可以支持 Config 解析自定义类型，自定义类型可以和常规stl容器一起使用
+
+配置的事件机制：
+- 当一个配置项发生修改的时候，可以反向通知对应的代码，回调
+
+## 日志系统整合配置系统
+```yaml
+logs:
+    - name: root
+      level: (debug, info, warn, error, fatal)
+      formatter: '%d%T%p%T%t%m%n'
+      appender:
+        - type: (StdoutLogAppender, FileLogAppender)
+          level: (debug, ...)
+          file: /logs/xxx.log
+```
+```cpp
+    shs::Logger g_logger = shs::LoggerMgr::GetInstance()->getLogger(name);
+    SHS_LOG_INFO(g_logger) << "xxxx log";
+```
+```cpp
+static Logger::ptr g_log = SHS_LOG_NAME("system");
+//m_root, m_system-> m_root, 当logger的appenders为空，使用root写logger
+```
+
 ## 知识点
 - std::enable_shared_from_this
 - 宏定义 与 inline
@@ -74,8 +99,9 @@ public:
     }
 };
 ```
-
+- 全局对象的构造和初始化在main函数之前
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）
 - [ ] 减少日志模块的耦合度
     - 删去 Logger 类中的格式对象 m_formatter
+- [ ] config 和 log 模块相互包含头文件，需要考虑如何解耦

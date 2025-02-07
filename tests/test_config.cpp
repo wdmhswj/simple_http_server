@@ -175,7 +175,10 @@ void test_class() {
         } \
         SHS_LOG_INFO(SHS_LOG_ROOT()) <<  prefix << ": size=" << m.size(); \
     }
-    
+    g_person->addListener(2333, [](const Person& o, const Person& n) {
+        SHS_LOG_INFO(SHS_LOG_ROOT()) << "old value: " << o.toString() << "; new value: " << n.toString();
+    });
+
     XX_PM(g_person_map, "class.map before");
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_person_vec_map->toString();
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_list_person->toString();
