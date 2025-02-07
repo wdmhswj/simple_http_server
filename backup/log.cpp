@@ -19,7 +19,7 @@ LogEvent::LogEvent(Logger::ptr logger, LogLevel level, const std::string& file, 
 {
 }
 
-Logger::Logger(const std::string& name = "root"): m_name(name) {
+Logger::Logger(const std::string& name): m_name(name) {
 
 }
 void Logger::log(LogLevel level, LogEvent::ptr event) {

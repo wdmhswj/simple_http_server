@@ -34,4 +34,4 @@
 // 获取主日志器
 #define SHS_LOG_ROOT() shs::LoggerMgr::GetInstance()->getRoot()
 // 获取name的日志器
-#define SHS_LOG_NAME(name) shs::LoggerMgr::GetInstance()->getRoot(name)
+#define SHS_LOG_NAME(name) shs::LoggerMgr::GetInstance()->getLogger(name)

@@ -32,13 +32,22 @@ public:
     }
 
     static LogLevel from_string(const std::string& str) {
-        if (str == "UNKNOW") return LogLevel::UNKNOW;
-        if (str == "DEBUG") return LogLevel::DEBUG;
-        if (str == "INFO") return LogLevel::INFO;
-        if (str == "WARN") return LogLevel::WARN;
-        if (str == "ERROR") return LogLevel::ERROR_;
-        if (str == "FATAL") return LogLevel::FATAL;
-        throw std::invalid_argument("Invalid log level string");
+        #define XX(level, log_level) if(str == #level) return LogLevel::log_level
+
+        XX(UNKNOW, UNKNOW);
+        XX(unknow, UNKNOW);
+        XX(DEBUG, DEBUG);
+        XX(debug, DEBUG);
+        XX(INFO, INFO);
+        XX(info, INFO);
+        XX(WARN, WARN);
+        XX(warn, WARN);
+        XX(ERROR, ERROR_);
+        XX(error, ERROR_);
+        XX(FATAL, FATAL);
+        XX(fatal, FATAL);
+        #undef XX
+        return LogLevel::UNKNOW;
     }
 };
 

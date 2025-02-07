@@ -43,3 +43,5 @@
 ## 2025/2/7: 配置系统/日志系统
 - [x] 配置更变事件：<functional>库，使用std::map实现对std::function的比较和删除（添加/删除/获取这3个函数），在 setValue() 函数中先比较值是否更变，再调用回调函数
 - [x] 日志系统整合配置系统：SHS_LOG_NAME, LoggerManager::getLogger(), Logger::log(), Logger::Logger(), g_log_defines, struct LogIniter
+- [x] 日志系统整合：Logger::setFormatter/getFormatter, is_error（解析时加is_error判断），LogIniter，直接偏特化 LogDefine，而不是 std::set<LogDefine>, log.yml，LogLevel::fromString(), LogDefine偏特化
+- [x] toYamlString(), test_log()

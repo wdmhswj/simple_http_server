@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(SimpleHttpServer)
 
+# yaml-cpp 使用静态库
+add_definitions(-DYAML_CPP_STATIC_DEFINE)
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -66,8 +69,8 @@ set_target_properties(log_static PROPERTIES
 )
 
 
-target_compile_definitions(log PRIVATE YAML_CPP_STATIC_DEFINE)
-target_compile_definitions(log_static PRIVATE YAML_CPP_STATIC_DEFINE)
+# target_compile_definitions(log PRIVATE YAML_CPP_STATIC_DEFINE)
+# target_compile_definitions(log_static PRIVATE YAML_CPP_STATIC_DEFINE)
 
 target_include_directories(log PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/_log
@@ -121,8 +124,8 @@ target_link_libraries(config_static
     yaml-cpp
     log
 )
-target_compile_definitions(config PRIVATE YAML_CPP_STATIC_DEFINE)
-target_compile_definitions(config_static PRIVATE YAML_CPP_STATIC_DEFINE)
+# target_compile_definitions(config PRIVATE YAML_CPP_STATIC_DEFINE)
+# target_compile_definitions(config_static PRIVATE YAML_CPP_STATIC_DEFINE)
 
 
 
@@ -131,6 +134,7 @@ target_compile_definitions(config_static PRIVATE YAML_CPP_STATIC_DEFINE)
 # 创建可执行文件
 add_executable(test tests/test.cpp)
 target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/src/_log)
+# target_compile_definitions(test PRIVATE YAML_CPP_STATIC_DEFINE)
 set_target_properties(test PROPERTIES 
     OUTPUT_NAME "test"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
@@ -140,7 +144,7 @@ target_link_libraries(test PRIVATE log_static)
 # test_config
 
 add_executable(test_config tests/test_config.cpp)
-target_compile_definitions(test_config PRIVATE YAML_CPP_STATIC_DEFINE)
+# target_compile_definitions(test_config PRIVATE YAML_CPP_STATIC_DEFINE)
 target_include_directories(test_config PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/config
     ${CMAKE_SOURCE_DIR}/src/_log

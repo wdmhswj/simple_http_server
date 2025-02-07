@@ -367,10 +367,6 @@ public:
     // 查询配置参数，返回配置参数的基类
     static ConfigVarBase::ptr LookupBase(const std::string& name);
 
-    static ConfigVarMap& GetDatas() {
-        static ConfigVarMap s_datas;
-        return s_datas;
-    }
 
     // static void debug() {
     //     std::cout << "m_datas: size=" << m_datas.size() << "\n";
@@ -382,6 +378,10 @@ private:
     // static std::mutex m_mutex;  // 添加互斥锁
 
     // static ConfigVarMap m_datas;
+    static ConfigVarMap& GetDatas() {
+        static ConfigVarMap s_datas;
+        return s_datas;
+    }
 };
 
 

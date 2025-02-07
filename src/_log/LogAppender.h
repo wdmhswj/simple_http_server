@@ -25,6 +25,9 @@ public:
     // 对日志级别的操作
     void setLevel(LogLevel level) { m_level = level; }
     LogLevel getLevel() const { return m_level; }
+
+    virtual YAML::Node toYamlNode() = 0;
+    virtual std::string toYamlString() = 0;
 protected:                                                      // 保护模式：public继承的子类还可以直接访问
     LogLevel m_level = LogLevel::DEBUG;                                           // 日志级别
     LogFormatter::ptr m_formatter = std::make_shared<LogFormatter>("%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");   // 输出格式
@@ -38,6 +41,8 @@ public:
     
     void log(Logger::ptr logger, LogLevel level, LogEvent::ptr event) override;
 
+    YAML::Node toYamlNode();
+    std::string toYamlString();
 private:
 };
 
@@ -52,6 +57,9 @@ public:
 
     // 重新打开文件，文件打开成功返回 true
     bool reopen();
+    
+    YAML::Node toYamlNode();
+    std::string toYamlString();
 private:
     std::string m_filename;     // 文件名
     std::ofstream m_filestream; // 文件输出流

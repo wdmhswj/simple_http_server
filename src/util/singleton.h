@@ -38,7 +38,8 @@ template<class T, class X = void, int N=0>
 class SingleTonPtr {
 public:
     static std::shared_ptr<T> GetInstance() {
-        return std::make_shared<T>();
+        static auto v = std::make_shared<T>();
+        return v;
         //return GetInstancePtr<T, X, N>();
     }
 };

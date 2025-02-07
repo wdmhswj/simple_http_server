@@ -1,0 +1,15 @@
+logs:
+    - name: root
+      level: info
+      appenders:
+          - type: FileLogAppender
+            file: D:\\repositories\\simple_http_server\\bin\\root.txt
+          - type: StdoutLogAppender
+            formatter: '%d%T%m%n'
+    - name: system
+      level: info
+      appenders:
+          - type: FileLogAppender
+            file: D:\\repositories\\simple_http_server\\bin\\system.txt
+          - type: StdoutLogAppender
+            formatter: '%d%T%m%n'

@@ -4,7 +4,7 @@
 #include <yaml-cpp/yaml.h>
 #include "../src/util/util.h"
 
-#if 1
+#if 0
 shs::ConfigVar<int>::ptr g_int_value_config = shs::Config::Lookup((int)8080, "system.port", "system.port description");
 shs::ConfigVar<float>::ptr g_fint_value_config = shs::Config::Lookup((float)8080, "system.port", "system.port description");
 shs::ConfigVar<double>::ptr g_double_value_config = shs::Config::Lookup((double)8080.7777, "system.call", "system.call description");
@@ -193,10 +193,29 @@ void test_class() {
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_list_person->toString();
 }
 
+void test_log() {
+    static shs::Logger::ptr system_log = SHS_LOG_NAME("system");
+
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "hello root" << std::endl;
+    SHS_LOG_INFO(system_log) << "hello system" << std::endl;
+    std::cout << shs::LoggerMgr::GetInstance()->toYamlString() << std::endl;
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\test.yml", "/home/wsl/repositories/simple_http_server/bin/conf/test.yml"));
+    shs::Config::LoadFromYaml(root);
+    std::cout << "=============" << std::endl;
+    std::cout << shs::LoggerMgr::GetInstance()->toYamlString() << std::endl;
+    std::cout << "=============" << std::endl;
+    std::cout << root << std::endl;
+    SHS_LOG_INFO(system_log) << "hello system" << std::endl;
+    SHS_LOG_INFO(SHS_LOG_ROOT()) << "hello root" << std::endl;
+
+    // system_log->setFormatter("%d - %m%n");
+    // SHS_LOG_INFO(system_log) << "hello system" << std::endl;
+}
 int main(int argc, char** argv) {
 
     // test_yaml();
     // test_config();
-    test_class();
+    // test_class();
+    test_log();
     return 0;
 }

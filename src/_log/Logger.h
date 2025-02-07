@@ -4,6 +4,7 @@
 #include <string>
 #include "LogLevel.h"
 #include "list"
+#include <yaml-cpp/yaml.h>
 namespace shs {
 
 class LogAppender;
@@ -35,6 +36,15 @@ public:
     const std::string& getName() const { return m_name; }
 
     void setRoot(Logger::ptr root) { m_root = root; }
+
+    void clearAppenders() {
+        m_appenders.clear();
+    }
+
+    YAML::Node toYamlNode();
+    std::string toYamlString();
+
+    size_t getAppendersSize() const { return m_appenders.size(); }
 private:
     std::string m_name;                         // 日志名称
     LogLevel m_level;                           // 日志级别
