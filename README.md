@@ -127,3 +127,23 @@ ps aux | grep test_thread
 # 查询pid对应进程的线程信息
 top -H -p 22924
 ```
+```shell
+tasklist /FI "IMAGENAME eq test_thread.exe"
+Get-CimInstance Win32_Process -Filter "ProcessId = 14748"
+Get-CimInstance Win32_Thread -Filter "ProcessId = 14748"
+
+# 获取所有进程
+Get-Process
+
+# 获取特定进程
+Get-Process test_thread
+
+# 获取进程的详细信息，包括线程
+Get-Process test_thread | Select-Object Name, ID, Threads
+
+# 获取线程详细信息
+(Get-Process test_thread).Threads | Format-Table Id, ThreadState, WaitReason
+
+# 按CPU使用率排序
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 10
+```

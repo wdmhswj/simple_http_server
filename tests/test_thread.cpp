@@ -17,7 +17,7 @@ void fun1() {
                              << " id: " << shs::GetThreadIdBySyscall()
                              << " this.id: " << shs::Thread::GetThis()->getId();
 
-    std::this_thread::sleep_for(std::chrono::seconds(30));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     // for(int i = 0; i < 100000; ++i) {
     //     //shs::RWMutex::WriteLock lock(s_mutex);
     //     shs::Mutex::Lock lock(s_mutex);

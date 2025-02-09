@@ -35,7 +35,12 @@ Thread::Thread(std::function<void()> cb, const std::string& name)
     if(name.empty())
         m_name = "UNKNOW";
 #ifdef _WIN32
-
+    HANDLE rt = CreateThread(nullptr, 0, &Thread::run, this, 0, nullptr);
+    if(!rt) {
+        SHS_LOG_ERROR(g_logger) << "pthread_create thread fail, error=" << GetLastError() << " name=" << name;
+        throw std::logic_error("pthread_create error");
+    }
+    m_thread = rt;
 #else
     int rt = pthread_create(&m_thread, nullptr, &Thread::run, this);    // 创建线程并执行 run 函数
     if(rt) {
@@ -47,7 +52,9 @@ Thread::Thread(std::function<void()> cb, const std::string& name)
 
 Thread::~Thread() {
 #ifdef _WIN32
-
+    if(m_thread) {
+        CloseHandle(m_thread);  // 关闭句柄，但线程会继续执行直到结束
+    }
 #else
     if(m_thread) {
         pthread_detach(m_thread);
@@ -57,6 +64,19 @@ Thread::~Thread() {
 
 void Thread::join() {
 #ifdef _WIN32
+    // std::cout << "m_thread=" << m_thread << std::endl;
+    if(m_thread) {
+        WaitForSingleObject(m_thread, INFINITE);
+        // std::cout << "m_thread=" << m_thread << std::endl;
+        DWORD exitCode;
+        
+        if(!GetExitCodeThread(m_thread, &exitCode)) {
+            SHS_LOG_ERROR(g_logger) << "WaitForSingleObject thread fail, exitCode=" << exitCode << " name=" << m_name;
+            throw std::logic_error("WaitForSingleObject error");
+        }
+        CloseHandle(m_thread);
+        m_thread = nullptr;
+    }
 
 #else
     if(m_thread) {
@@ -70,22 +90,43 @@ void Thread::join() {
 #endif
 }
 
+#ifdef _WIN32
+DWORD WINAPI Thread::run(LPVOID arg) {
+    Thread* thread = static_cast<Thread*>(arg);
+    t_thread = thread;
+    t_thread_name = thread->m_name;
+    thread->m_id = shs::GetThreadIdBySyscall();
 
+    HRESULT hr = SetThreadDescription(GetCurrentThread(), std::wstring(thread->m_name.begin(), thread->m_name.end()).c_str());
+    if (FAILED(hr))
+    {
+        SHS_LOG_ERROR(g_logger) << "SetThreadDescription thread fail" << " name=" << thread->m_name;
+        return 1;
+
+    }
+
+    std::function<void()> cb;
+    cb.swap(thread->m_cb);      // 不仅转移了可调用对象的所有权，还将 thread->m_cb 置空
+
+    cb();
+    return 0;
+
+}
+#else
 void* Thread::run(void* arg) {
     Thread* thread = static_cast<Thread*>(arg); // arg 指向Thread对象
     t_thread = thread;
     t_thread_name = thread->m_name;             // ?
     thread->m_id = shs::GetThreadIdBySyscall();
-#ifdef _WIN32
 
-#else
     pthread_setname_np(pthread_self(), thread->m_name.substr(0, 15).c_str());
-#endif
+
     std::function<void()> cb;
     cb.swap(thread->m_cb);      // 不仅转移了可调用对象的所有权，还将 thread->m_cb 置空
 
     cb();
     return nullptr;
 }
+#endif
 
 }

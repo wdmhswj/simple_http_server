@@ -43,14 +43,18 @@ public:
 private:
 
     // 线程执行函数
+#ifdef _WIN32
+    static DWORD WINAPI run(LPVOID arg);
+#else
     static void* run(void* arg);
+#endif
 
     // 线程id
     int64_t m_id = -1;
     // 线程结构
     // std::thread m_thread;
 #ifdef _WIN32
-
+    HANDLE m_thread = nullptr;
 #else
     pthread_t m_thread = 0;
 #endif
