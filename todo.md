@@ -45,3 +45,11 @@
 - [x] 日志系统整合配置系统：SHS_LOG_NAME, LoggerManager::getLogger(), Logger::log(), Logger::Logger(), g_log_defines, struct LogIniter
 - [x] 日志系统整合：Logger::setFormatter/getFormatter, is_error（解析时加is_error判断），LogIniter，直接偏特化 LogDefine，而不是 std::set<LogDefine>, log.yml，LogLevel::fromString(), LogDefine偏特化
 - [x] toYamlString(), test_log()
+
+## 2025/2/8: 配置/日志系统整合
+- [x] 文件路径改为相对路径
+
+## 2025/2/9: 线程模块
+- [ ] thread.h/cpp: class Thread, 拷贝/赋值构造函数 delete, static thread_local Thread*, pthread_detach(), pthread_join(), Thread::run()
+- [ ] sylay.h, test_thread.cpp
+- [ ] 不同 OS 下线程号对应

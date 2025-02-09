@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(SimpleHttpServer)
 
+include(cmake/utils.cmake)
+
 # yaml-cpp 使用静态库
 add_definitions(-DYAML_CPP_STATIC_DEFINE)
+# 在 CMakeLists.txt 中禁用 'builtin-macro-redefined' 警告
+add_definitions(-Wno-builtin-macro-redefined)
+
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -57,12 +62,20 @@ set(LIB_SRC_LOG
 
 # 创建共享库
 add_library(log SHARED ${LIB_SRC_LOG})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(log)
+
 set_target_properties(log PROPERTIES 
     OUTPUT_NAME "log"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
 
 add_library(log_static STATIC ${LIB_SRC_LOG})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(log_static)
+
 set_target_properties(log_static PROPERTIES 
     OUTPUT_NAME "log_static"
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
@@ -103,12 +116,20 @@ set(LIB_SRC_CONFIG
 
 # 创建共享库
 add_library(config SHARED ${LIB_SRC_CONFIG})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(config)
+
 set_target_properties(config PROPERTIES 
     OUTPUT_NAME "config"
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
 
 add_library(config_static STATIC ${LIB_SRC_CONFIG})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(config_static)
+
 set_target_properties(config_static PROPERTIES 
     OUTPUT_NAME "config_static"
     ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
@@ -133,6 +154,10 @@ target_link_libraries(config_static
 
 # 创建可执行文件
 add_executable(test tests/test.cpp)
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(test)
+
 target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/src/_log)
 # target_compile_definitions(test PRIVATE YAML_CPP_STATIC_DEFINE)
 set_target_properties(test PROPERTIES 
@@ -144,6 +169,10 @@ target_link_libraries(test PRIVATE log_static)
 # test_config
 
 add_executable(test_config tests/test_config.cpp)
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(test_config)
+
 # target_compile_definitions(test_config PRIVATE YAML_CPP_STATIC_DEFINE)
 target_include_directories(test_config PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/config

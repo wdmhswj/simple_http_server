@@ -208,7 +208,7 @@ void test_log() {
     SHS_LOG_INFO(system_log) << "hello system" << std::endl;
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "hello root" << std::endl;
 
-    // system_log->setFormatter("%d - %m%n");
+    // system_log->
     // SHS_LOG_INFO(system_log) << "hello system" << std::endl;
 }
 int main(int argc, char** argv) {

@@ -47,6 +47,11 @@ logs:
 static Logger::ptr g_log = SHS_LOG_NAME("system");
 //m_root, m_system-> m_root, 当logger的appenders为空，使用root写logger
 ```
+yaml 配置文件修改日志系统的 loggers 是通过在 log.cpp 源文件中创建一个全局变量`ConfigVar<std::set<LogDefine>>::ptr g_log_defines = Config::Lookup(std::set<LogDefine>(), "logs", "logs config");`，并在 LogIniter 结构体构造函数中为此全局变量添加回调函数，用于监听此配置变量值的变化，从而借助 SHS_LOG_NAME() 宏修改日志系统中对应的 logger
+
+## 线程模块
+暂时使用 std::thread (为了跨平台)
+
 
 ## 知识点
 - std::enable_shared_from_this
@@ -100,6 +105,14 @@ public:
 };
 ```
 - 全局对象的构造和初始化在main函数之前
+- C++11之后可以通过将构造函数声明为 delete 来实现禁用，不管作用域是public还是private
+- thread_local 关键词只对声明于命名空间作用域的对象、声明于块作用域的对象及静态数据成员允许。它指示对象拥有线程存储期。它能与 static 或 extern 结合，以分别指定内部或外部链接（除了静态数据成员始终拥有外部链接），但附加的 static 不影响存储期。 线程存储期: 对象的存储在线程开始时分配，而在线程结束时解分配。每个线程拥有其自身的对象实例。唯有声明为 thread_local 的对象拥有此存储期。 thread_local 能与 static 或 extern 一同出现，以调整链接。
+  - thread_local描述的对象在thread开始时分配，而在thread结束时分解。
+  - 一般在声明时赋值，在本thread中只执行一次。thread_local 
+  - 描述的对象依然只在作用域内有效。
+  - 描述类成员变量时，必须是static的。
+
+
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）
 - [ ] 减少日志模块的耦合度
