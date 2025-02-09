@@ -182,6 +182,42 @@ target_link_libraries(thread_static
     log
 )
 
+# thread_posix
+
+set(LIB_SRC_THREAD_POSIX 
+    src/thread_posix/thread_posix.cpp
+)
+
+# 创建共享库
+add_library(thread_posix SHARED ${LIB_SRC_THREAD_POSIX})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(thread_posix)
+
+set_target_properties(thread_posix PROPERTIES 
+    OUTPUT_NAME "thread_posix"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(thread_posix_static STATIC ${LIB_SRC_THREAD})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(thread_posix_static)
+
+set_target_properties(thread_posix_static PROPERTIES 
+    OUTPUT_NAME "thread_posix_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(thread_posix
+    PRIVATE
+    log
+)
+target_link_libraries(thread_posix_static
+    PRIVATE
+    log
+)
+
 # test
 
 # 创建可执行文件
@@ -247,4 +283,24 @@ set_target_properties(test_thread PROPERTIES
 
 target_link_libraries(test_thread PRIVATE
     thread_static
+)
+
+# test_thread_posix
+
+add_executable(test_thread_posix tests/test_thread_posix.cpp)
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(test_thread_posix)
+
+target_include_directories(test_thread_posix PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+)
+
+set_target_properties(test_thread_posix PROPERTIES 
+    OUTPUT_NAME "test_thread_posix"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+target_link_libraries(test_thread_posix PRIVATE
+    thread_posix_static
 )
