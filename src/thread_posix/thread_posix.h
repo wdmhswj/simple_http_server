@@ -8,7 +8,7 @@
 #include <string>
 
 
-    #include <Windows.h>
+    // #include <Windows.h>
     #include <pthread.h>
 
 
