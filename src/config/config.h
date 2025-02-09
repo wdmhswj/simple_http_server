@@ -6,8 +6,8 @@
 #include <typeinfo>
 #include <map>
 #include <boost/lexical_cast.hpp>
-#include "../_log/macro.h"
-#include "../util/util.h"
+#include "src/_log/macro.h"
+#include "src/util/util.h"
 #include <yaml-cpp/yaml.h>
 #include <list>
 #include <set>
@@ -16,7 +16,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <iostream>
-#include "../_log/log.h"
+#include "src/_log/log.h"
 
 namespace shs {
 // 配置变量的基类

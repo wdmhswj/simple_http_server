@@ -111,6 +111,7 @@ public:
   - 一般在声明时赋值，在本thread中只执行一次。thread_local 
   - 描述的对象依然只在作用域内有效。
   - 描述类成员变量时，必须是static的。
+- `error: ‘throw’ will always call ‘terminate’ [-Werror=terminate]` 编译失败原因：这个错误的原因是 C++11 中，所有析构函数默认都是 noexcept，这意味着你不能在析构函数中抛出异常。因为抛出异常的操作会导致 std::terminate 被调用，从而终止程序。 
 
 
 ## todo
@@ -118,3 +119,11 @@ public:
 - [ ] 减少日志模块的耦合度
     - 删去 Logger 类中的格式对象 m_formatter
 - [ ] config 和 log 模块相互包含头文件，需要考虑如何解耦
+
+## record
+```shell
+# 查询进程
+ps aux | grep test_thread
+# 查询pid对应进程的线程信息
+top -H -p 22924
+```

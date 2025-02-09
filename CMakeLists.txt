@@ -39,6 +39,8 @@ else()
     message(">> unknow.")
 endif()
 
+include_directories("${PROJECT_SOURCE_DIR}")
+
 # 判断编译器
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     message(">> using Clang")
@@ -82,8 +84,6 @@ set_target_properties(log_static PROPERTIES
 )
 
 
-# target_compile_definitions(log PRIVATE YAML_CPP_STATIC_DEFINE)
-# target_compile_definitions(log_static PRIVATE YAML_CPP_STATIC_DEFINE)
 
 target_include_directories(log PRIVATE 
     ${CMAKE_SOURCE_DIR}/src/_log
@@ -145,10 +145,42 @@ target_link_libraries(config_static
     yaml-cpp
     log
 )
-# target_compile_definitions(config PRIVATE YAML_CPP_STATIC_DEFINE)
-# target_compile_definitions(config_static PRIVATE YAML_CPP_STATIC_DEFINE)
 
+# thread
 
+set(LIB_SRC_THREAD 
+    src/thread/thread.cpp
+)
+
+# 创建共享库
+add_library(thread SHARED ${LIB_SRC_THREAD})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(thread)
+
+set_target_properties(thread PROPERTIES 
+    OUTPUT_NAME "thread"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(thread_static STATIC ${LIB_SRC_THREAD})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(thread_static)
+
+set_target_properties(thread_static PROPERTIES 
+    OUTPUT_NAME "thread_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(thread
+    PRIVATE
+    log
+)
+target_link_libraries(thread_static
+    PRIVATE
+    log
+)
 
 # test
 
@@ -193,4 +225,26 @@ target_link_libraries(test_config PRIVATE
     yaml-cpp
 )
 
+# test_thread
 
+add_executable(test_thread tests/test_thread.cpp)
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(test_thread)
+
+# target_compile_definitions(test_thread PRIVATE YAML_CPP_STATIC_DEFINE)
+target_include_directories(test_thread PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src/_log
+)
+
+target_link_directories(test_thread PRIVATE 
+)
+
+set_target_properties(test_thread PROPERTIES 
+    OUTPUT_NAME "test_thread"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+target_link_libraries(test_thread PRIVATE
+    thread_static
+)

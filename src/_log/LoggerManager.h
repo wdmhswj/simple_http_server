@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include "Logger.h"
-#include "../util/singleton.h"
+#include "src/util/singleton.h"
 namespace shs {
 
 class LoggerManager

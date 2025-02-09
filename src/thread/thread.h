@@ -7,6 +7,12 @@
 #include <memory>
 #include <string>
 
+#ifdef _WIN32
+    #include <Windows.h>
+#else 
+    #include <pthread.h>
+#endif
+
 namespace shs {
 
 class Thread {
@@ -43,6 +49,12 @@ private:
     int64_t m_id = -1;
     // 线程结构
     // std::thread m_thread;
+#ifdef _WIN32
+
+#else
+    pthread_t m_thread = 0;
+#endif
+
     // 线程执行函数
     std::function<void()> m_cb;
     // 线程名称

@@ -12,8 +12,8 @@
 #include "Logger.h"
 #include "LogLevel.h"
 #include "LoggerManager.h"
-#include "../util/util.h"
-#include "../config/config.h"
+#include "src/util/util.h"
+#include "src/config/config.h"
 
 namespace shs {
 
