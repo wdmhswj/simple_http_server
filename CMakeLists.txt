@@ -10,8 +10,8 @@ add_definitions(-Wno-builtin-macro-redefined)
 
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) # -fPIC
 
 # 清除缓存中的值
 unset(ENABLE_OPTIMIZE CACHE)
