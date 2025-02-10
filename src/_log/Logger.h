@@ -16,8 +16,8 @@ class LogFormatter;
 class Logger: public std::enable_shared_from_this<Logger> {
 public:
     using ptr = std::shared_ptr<Logger>;
-    // using MutexType = Mutex;
-    using MutexType = NullMutex;
+    using MutexType = Mutex;
+    // using MutexType = NullMutex;
 
     Logger(const std::string& name = "root");
     void log(LogLevel level, std::shared_ptr<LogEvent> event);

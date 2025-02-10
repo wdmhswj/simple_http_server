@@ -13,8 +13,8 @@ namespace shs {
 class LogAppender {
 public:
     using ptr = std::shared_ptr<LogAppender>;
-    // using MutexType = Mutex;
-    using MutexType = NullMutex;
+    using MutexType = Mutex;
+    // using MutexType = NullMutex;
 
     LogAppender(LogLevel level, LogFormatter::ptr formatter);
     LogAppender() {}

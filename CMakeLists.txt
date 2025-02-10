@@ -149,12 +149,12 @@ target_link_directories(log_static PRIVATE
 
 target_link_libraries(log PRIVATE
     yaml-cpp
-    mutex
+    mutex_static
 )
 
 target_link_libraries(log_static PRIVATE
     yaml-cpp
-    mutex
+    mutex_static
 )
 
 # config
@@ -187,12 +187,12 @@ set_target_properties(config_static PROPERTIES
 target_link_libraries(config
     PRIVATE
     yaml-cpp
-    log
+    log_static
 )
 target_link_libraries(config_static
     PRIVATE
     yaml-cpp
-    log
+    log_static
 )
 
 # thread
@@ -224,11 +224,11 @@ set_target_properties(thread_static PROPERTIES
 
 target_link_libraries(thread
     PRIVATE
-    log
+    log_static
 )
 target_link_libraries(thread_static
     PRIVATE
-    log
+    log_static
 )
 
 # thread_posix
@@ -260,11 +260,11 @@ set_target_properties(thread_posix_static PROPERTIES
 
 target_link_libraries(thread_posix
     PRIVATE
-    log
+    log_static
 )
 target_link_libraries(thread_posix_static
     PRIVATE
-    log
+    log_static
 )
 
 # test
