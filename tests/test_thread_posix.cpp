@@ -20,7 +20,7 @@ void fun1() {
     // std::this_thread::sleep_for(std::chrono::seconds(1));
     for(long long i = 0; i < 1000000; ++i) {
         // shs::RWMutex::WriteLock lock(s_rwmutex);
-        shs::Mutex::Lock lock(s_mutex);
+        // shs::Mutex::Lock lock(s_mutex);
         ++count;
     }
 }

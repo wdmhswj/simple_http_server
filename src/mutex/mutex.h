@@ -2,11 +2,9 @@
 #include "src/util/noncopyable.h"
 #include <pthread.h>
 #include <cstdint>
-#ifdef _WIN32
 
-#else
 #include <semaphore.h>
-#endif
+
 namespace shs {
 
 class Semaphore: NonCopyable {
