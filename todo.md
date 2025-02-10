@@ -50,6 +50,9 @@
 - [x] 文件路径改为相对路径
 
 ## 2025/2/9: 线程模块
-- [ ] thread.h/cpp: class Thread, 拷贝/赋值构造函数 delete, static thread_local Thread*, pthread_detach(), pthread_join(), Thread::run()
-- [ ] sylay.h, test_thread.cpp
-- [ ] 不同 OS 下线程号对应
+- [x] thread.h/cpp: class Thread, 拷贝/赋值构造函数 delete, static thread_local Thread*, pthread_detach(), pthread_join(), Thread::run()
+- [x] sylay.h, test_thread.cpp
+- [x] 不同 OS 下线程号对应
+
+## 2025/2/10: 线程模块
+- [x] 信号量与互斥量：读写分离，出线程构造函数之前保证线程已经启动 

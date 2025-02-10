@@ -112,8 +112,9 @@ public:
   - 描述的对象依然只在作用域内有效。
   - 描述类成员变量时，必须是static的。
 - `error: ‘throw’ will always call ‘terminate’ [-Werror=terminate]` 编译失败原因：这个错误的原因是 C++11 中，所有析构函数默认都是 noexcept，这意味着你不能在析构函数中抛出异常。因为抛出异常的操作会导致 std::terminate 被调用，从而终止程序。 
-
-
+- 互斥锁、条件变量、读写锁、自旋锁、信号量: https://zhuanlan.zhihu.com/p/161010435
+- 引用类型的类成员变量：在 C++ 编程中，引用成员变量是一种特殊的类型，它允许类的实例之间共享状态和行为。引用成员变量在类设计和对象模型中扮演着重要的角色。引用成员变量必须在构造函数的初始化列表中进行初始化，并且一旦初始化后，就不能改变其引用的对象。
+- CMake 中 build目录下的CMakeCache.txt用于缓存之前的配置和变量，但是会导致当CMakeLists.txt中一些变量改变时，CMakeCache.txt中并没有相应随之改变，需要手动删除
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）
 - [ ] 减少日志模块的耦合度

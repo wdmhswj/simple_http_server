@@ -1,15 +1,15 @@
-#include "../src/_log/log.h"
-#include "../src/thread_posix/thread_posix.h"
+#include "src/_log/log.h"
+#include "src/thread_posix/thread_posix.h"
 #include <unistd.h>
 #include <thread>
 #include <chrono>
-
+#include "src/mutex/mutex.h"
 
 shs::Logger::ptr g_logger = SHS_LOG_ROOT();
 
-int count = 0;
-//shs::RWMutex s_mutex;
-// shs::Mutex s_mutex;
+long long count = 0;
+shs::RWMutex s_rwmutex;
+shs::Mutex s_mutex;
 
 void fun1() {
     SHS_LOG_INFO(g_logger) << "name: " << shs::Thread::GetName()
@@ -17,12 +17,12 @@ void fun1() {
                              << " id: " << shs::GetThreadIdBySyscall()
                              << " this.id: " << shs::Thread::GetThis()->getId();
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    // for(int i = 0; i < 100000; ++i) {
-    //     //shs::RWMutex::WriteLock lock(s_mutex);
-    //     shs::Mutex::Lock lock(s_mutex);
-    //     ++count;
-    // }
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    for(long long i = 0; i < 1000000; ++i) {
+        // shs::RWMutex::WriteLock lock(s_rwmutex);
+        shs::Mutex::Lock lock(s_mutex);
+        ++count;
+    }
 }
 
 void fun2() {
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         thrs[i]->join();
     }
     SHS_LOG_INFO(g_logger) << "thread test end";
-    // SHS_LOG_INFO(g_logger) << "count=" << count;
+    SHS_LOG_INFO(g_logger) << "count=" << count;
 
     return 0;
 }

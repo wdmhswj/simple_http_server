@@ -6,7 +6,7 @@
 #include <functional>
 #include <memory>
 #include <string>
-
+#include "src/util/noncopyable.h"
 
     // #include <Windows.h>
     #include <pthread.h>
@@ -14,13 +14,10 @@
 
 namespace shs {
 
-class Thread {
+class Thread: NonCopyable {
 public:
     using ptr = std::shared_ptr<Thread>;
     Thread(std::function<void()> cb, const std::string& name);
-    Thread(const Thread& o) = delete;
-    Thread(Thread&& o) = delete;
-    Thread& operator=(const Thread& o) =delete;
     ~Thread();
 
     int64_t getId() const { return m_id; }

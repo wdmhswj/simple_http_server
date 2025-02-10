@@ -13,15 +13,29 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_BUILD_TYPE Debug)
 
+# 清除缓存中的值
+unset(ENABLE_OPTIMIZE CACHE)
+# 是否优化
+option(ENABLE_OPTIMIZE "Enable Compiler Optimization" OFF)
+
 # 从环境变量中获取 CXXFLAGS（如果定义）
 if(DEFINED ENV{CXXFLAGS})
-    set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -O3 -g -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
+    set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -g -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
 else()
-    set(CMAKE_CXX_FLAGS "-O3 -g -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
+    set(CMAKE_CXX_FLAGS "-g -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
 endif()
 
+
+if(ENABLE_OPTIMIZE)
+    set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")
+    message(">> ENABLE_OPTIMIZE ON")
+else()
+    message(">> ENABLE_OPTIMIZE OFF")
+endif()
+
+ 
 # 查看编译器类型
-message("CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+message(">> CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
 # 判断平台
 if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
@@ -218,6 +232,39 @@ target_link_libraries(thread_posix_static
     log
 )
 
+# mutex
+set(LIB_SRC_MUTEX 
+    src/mutex/mutex.cpp
+)
+
+# 创建共享库
+add_library(mutex SHARED ${LIB_SRC_MUTEX})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(mutex)
+
+set_target_properties(mutex PROPERTIES 
+    OUTPUT_NAME "mutex"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(mutex_static STATIC ${LIB_SRC_MUTEX})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(mutex_static)
+
+set_target_properties(mutex_static PROPERTIES 
+    OUTPUT_NAME "mutex_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(mutex
+    PRIVATE
+)
+target_link_libraries(mutex_static
+    PRIVATE
+)
+
 # test
 
 # 创建可执行文件
@@ -303,4 +350,5 @@ set_target_properties(test_thread_posix PROPERTIES
 
 target_link_libraries(test_thread_posix PRIVATE
     thread_posix_static
+    mutex_static
 )
