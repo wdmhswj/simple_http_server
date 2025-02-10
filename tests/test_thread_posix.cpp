@@ -1,9 +1,10 @@
 #include "src/_log/log.h"
 #include "src/thread_posix/thread_posix.h"
 #include <unistd.h>
-#include <thread>
+// #include <thread>
 #include <chrono>
 #include "src/mutex/mutex.h"
+#include "src/config/config.h"
 
 shs::Logger::ptr g_logger = SHS_LOG_ROOT();
 
@@ -39,18 +40,20 @@ void fun3() {
 
 int main(int argc, char** argv) {
     SHS_LOG_INFO(g_logger) << "thread test begin";
-    // YAML::Node root = YAML::LoadFile("/home/shs/test/shs/bin/conf/log2.yml");
-    // shs::Config::LoadFromYaml(root);
+    YAML::Node root = YAML::LoadFile("/home/wsl/repositories/simple_http_server/bin/conf/log2.yml");
+    shs::Config::LoadFromYaml(root);
 
     std::vector<shs::Thread::ptr> thrs;
-    for(int i = 0; i < 5; ++i) {
-        shs::Thread::ptr thr(new shs::Thread(&fun1, "name_" + std::to_string(i)));
-        //shs::Thread::ptr thr2(new shs::Thread(&fun3, "name_" + std::to_string(i * 2 + 1)));
-        thrs.push_back(thr);
-        //thrs.push_back(thr2);
+    for(int i = 0; i < 2; ++i) {
+        // shs::Thread::ptr thr(new shs::Thread(&fun1, "name_" + std::to_string(i)));
+        shs::Thread::ptr thr1(new shs::Thread(&fun2, "name_" + std::to_string(i * 2 + 1)));
+        shs::Thread::ptr thr2(new shs::Thread(&fun3, "name_" + std::to_string(i * 2)));
+        // thrs.push_back(thr);
+        thrs.push_back(thr1);
+        thrs.push_back(thr2);
     }
 
-    for(size_t i = 0; i < 5; ++i) {
+    for(size_t i = 0; i < thrs.size(); ++i) {
         thrs[i]->join();
     }
     SHS_LOG_INFO(g_logger) << "thread test end";

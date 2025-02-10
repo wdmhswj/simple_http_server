@@ -69,6 +69,39 @@ else()
 endif()
 
 
+# mutex
+set(LIB_SRC_MUTEX 
+    src/mutex/mutex.cpp
+)
+
+# 创建共享库
+add_library(mutex SHARED ${LIB_SRC_MUTEX})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(mutex)
+
+set_target_properties(mutex PROPERTIES 
+    OUTPUT_NAME "mutex"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(mutex_static STATIC ${LIB_SRC_MUTEX})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(mutex_static)
+
+set_target_properties(mutex_static PROPERTIES 
+    OUTPUT_NAME "mutex_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(mutex
+    PRIVATE
+)
+target_link_libraries(mutex_static
+    PRIVATE
+)
+
 # log
 
 set(LIB_SRC_LOG 
@@ -116,10 +149,12 @@ target_link_directories(log_static PRIVATE
 
 target_link_libraries(log PRIVATE
     yaml-cpp
+    mutex
 )
 
 target_link_libraries(log_static PRIVATE
     yaml-cpp
+    mutex
 )
 
 # config
@@ -232,39 +267,6 @@ target_link_libraries(thread_posix_static
     log
 )
 
-# mutex
-set(LIB_SRC_MUTEX 
-    src/mutex/mutex.cpp
-)
-
-# 创建共享库
-add_library(mutex SHARED ${LIB_SRC_MUTEX})
-
-# 将 __FILE__ 宏改为相对路径
-redefine_file_macro(mutex)
-
-set_target_properties(mutex PROPERTIES 
-    OUTPUT_NAME "mutex"
-    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
-)
-
-add_library(mutex_static STATIC ${LIB_SRC_MUTEX})
-
-# 将 __FILE__ 宏改为相对路径
-redefine_file_macro(mutex_static)
-
-set_target_properties(mutex_static PROPERTIES 
-    OUTPUT_NAME "mutex_static"
-    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
-)
-
-target_link_libraries(mutex
-    PRIVATE
-)
-target_link_libraries(mutex_static
-    PRIVATE
-)
-
 # test
 
 # 创建可执行文件
@@ -330,6 +332,7 @@ set_target_properties(test_thread PROPERTIES
 
 target_link_libraries(test_thread PRIVATE
     thread_static
+    mutex_static
 )
 
 # test_thread_posix
@@ -351,4 +354,6 @@ set_target_properties(test_thread_posix PROPERTIES
 target_link_libraries(test_thread_posix PRIVATE
     thread_posix_static
     mutex_static
+    config_static
+    log_static
 )

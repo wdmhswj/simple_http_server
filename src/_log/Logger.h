@@ -5,6 +5,7 @@
 #include "LogLevel.h"
 #include "list"
 #include <yaml-cpp/yaml.h>
+#include "src/mutex/mutex.h"
 namespace shs {
 
 class LogAppender;
@@ -15,6 +16,8 @@ class LogFormatter;
 class Logger: public std::enable_shared_from_this<Logger> {
 public:
     using ptr = std::shared_ptr<Logger>;
+    // using MutexType = Mutex;
+    using MutexType = NullMutex;
 
     Logger(const std::string& name = "root");
     void log(LogLevel level, std::shared_ptr<LogEvent> event);
@@ -31,13 +34,26 @@ public:
     void delAppender(std::shared_ptr<LogAppender> appender);
 
     // 对日志级别的操作
-    void setLevel(LogLevel level) { m_level = level; }
-    LogLevel getLevel() const { return m_level; }
-    const std::string& getName() const { return m_name; }
+    void setLevel(LogLevel level) { 
+        MutexType::Lock lock(m_mutex);
+        m_level = level; 
+    }
+    LogLevel getLevel() const { 
+        MutexType::Lock lock(m_mutex);
+        return m_level; 
+    }
+    const std::string& getName() const { 
+        // MutexType::Lock lock(m_mutex);
+        return m_name; 
+    }
 
-    void setRoot(Logger::ptr root) { m_root = root; }
+    void setRoot(Logger::ptr root) { 
+        MutexType::Lock lock(m_mutex);
+        m_root = root; 
+    }
 
     void clearAppenders() {
+        MutexType::Lock lock(m_mutex);
         m_appenders.clear();
     }
 
@@ -52,7 +68,7 @@ private:
     // std::shared_ptr<LogAppender> m_appender;
     std::list<std::shared_ptr<LogAppender>> m_appenders;    // Appender 集合
     Logger::ptr m_root;                                     // 主日志器
-
+    mutable MutexType m_mutex;
 };
 
 

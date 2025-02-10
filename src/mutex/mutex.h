@@ -126,6 +126,21 @@ private:
 };
 
 
+// Null互斥量
+class NullMutex: NonCopyable {
+public:
+    // 局部锁
+    using Lock = ScopedLockImpl<NullMutex>;
+    NullMutex() {}
+    ~NullMutex() {}
+    void lock() {}
+    void unlock() {}
+
+private:
+    // mutex
+    pthread_mutex_t m_mutex;
+};
+
 // 读写互斥量
 class RWMutex: NonCopyable {
 public:
@@ -143,5 +158,22 @@ private:
     // mutex
     pthread_rwlock_t m_lock;
 };
+// 读写互斥量
+class NullRWMutex: NonCopyable {
+public:
+    // 局部读锁
+    using ReadLock = ReadScopedLockImpl<NullRWMutex>;
+    // 局部写锁
+    using WriteLock = WriteScopedLockImpl<NullRWMutex>;
+    NullRWMutex() {}
+    ~NullRWMutex() {}
+    void rdlock() {}
+    void wrlock() {}
+    void unlock() {}
 
+private:
+    // mutex
+    pthread_rwlock_t m_lock;
+};
+    
 }
