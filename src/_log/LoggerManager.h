@@ -10,7 +10,9 @@ namespace shs {
 class LoggerManager
 {
 public:
-    using MutexType = Mutex;
+    // using MutexType = Mutex;
+    using MutexType = SpinLock;
+    // using MutexType = CASLock;
     // using MutexType = NullMutex;
     LoggerManager();
     ~LoggerManager();

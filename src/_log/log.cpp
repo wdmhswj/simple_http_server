@@ -150,8 +150,17 @@ void FileLogAppender::log(Logger::ptr logger, LogLevel level, LogEvent::ptr even
     // std::cout << "level: " << LogLevelHelper::to_string(level) << std::endl;
     // std::cout << "m_level: " << LogLevelHelper::to_string(m_level) << std::endl;
     if(level >= m_level) {
+        uint64_t now = event->getTime();
+        // uint64_t now = time(0);
+        if(now >= (m_lastTime+3)) {
+            reopen();
+            m_lastTime = now;
+        }
         MutexType::Lock lock(m_mutex);
-        m_filestream << m_formatter->format(logger, level, event) << std::endl;
+        // m_filestream << m_formatter->format(logger, level, event) << std::endl;
+        if(!m_formatter->format(m_filestream, logger, level, event)) {
+            std::cout << "error" << std::endl;
+        }
     }
 }
 
@@ -161,11 +170,12 @@ FileLogAppender::FileLogAppender(const std::string& filename): m_filename(filena
 
 bool FileLogAppender::reopen() {
     MutexType::Lock lock(m_mutex);
+    // std::cout << "reopen" << std::endl;
     if(m_filestream) {  // 流是否打开/是否有效
         m_filestream.close();
     }
 
-    m_filestream.open(m_filename);
+    m_filestream.open(m_filename, std::ios::app);
     return !!m_filestream;
 }
 

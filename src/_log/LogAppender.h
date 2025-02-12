@@ -13,7 +13,9 @@ namespace shs {
 class LogAppender {
 public:
     using ptr = std::shared_ptr<LogAppender>;
-    using MutexType = Mutex;
+    // using MutexType = Mutex;
+    using MutexType = SpinLock;
+    // using MutexType = CASLock;
     // using MutexType = NullMutex;
 
     LogAppender(LogLevel level, LogFormatter::ptr formatter);
@@ -80,6 +82,7 @@ public:
 private:
     std::string m_filename;     // 文件名
     std::ofstream m_filestream; // 文件输出流
+    uint64_t m_lastTime = 0;    // 上次重新打开时间
 };
 }
 

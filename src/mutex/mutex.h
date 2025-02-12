@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include <semaphore.h>
+#include <atomic>
 
 namespace shs {
 
@@ -175,5 +176,54 @@ private:
     // mutex
     pthread_rwlock_t m_lock;
 };
-    
+
+// 自旋锁
+class SpinLock: NonCopyable {
+public:
+    using Lock = ScopedLockImpl<SpinLock>;
+
+    SpinLock();
+    ~SpinLock();
+
+    void lock();
+    void unlock();
+
+private:
+    pthread_spinlock_t m_mutex;
+};
+
+// 原子锁
+class CASLock: NonCopyable {
+public:
+    using Lock = ScopedLockImpl<CASLock>;
+    CASLock() {
+        m_mutex.clear();
+    }
+    ~CASLock() {
+    }
+    void lock() noexcept
+    {
+        while (m_mutex.test_and_set(std::memory_order_acquire))
+    #if defined(__cpp_lib_atomic_wait) && __cpp_lib_atomic_wait >= 201907L
+            // C++ 20 起可以仅在 unlock 中通知后才获得锁，从而避免任何无效自旋
+            // 注意，即使 wait 保证一定在值被更改后才返回，但锁定是在下一次执行条件时完成的
+            m_.wait(true, std::memory_order_relaxed)
+    #endif
+                ;
+    }
+    bool try_lock() noexcept
+    {
+        return !m_mutex.test_and_set(std::memory_order_acquire);
+    }
+    void unlock() noexcept
+    {
+        m_mutex.clear(std::memory_order_release);
+    #if defined(__cpp_lib_atomic_wait) && __cpp_lib_atomic_wait >= 201907L
+        m_.notify_one();
+    #endif
+    }
+private:
+    std::atomic_flag m_mutex;
+};
+   
 }

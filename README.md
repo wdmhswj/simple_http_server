@@ -129,7 +129,9 @@ public:
 - CMake 中 build目录下的CMakeCache.txt用于缓存之前的配置和变量，但是会导致当CMakeLists.txt中一些变量改变时，CMakeCache.txt中并没有相应随之改变，需要手动删除
 - 可以通过将类的成员遍历 m_mutex 声明为 mutable，从而可以在 const 成员函数中 使用 m_mutex 进行加锁。
 - 在Linux上，构建共享库时，所有的目标文件和静态库必须是位置无关的，即必须使用 -fPIC 编译选项。
-
+- 互斥锁：pthread_mutex_init：用于初始化互斥锁（Mutex）。互斥锁是一种阻塞锁，如果锁已被占用，线程会进入睡眠状态，直到锁被释放。
+- 自旋锁：pthread_spin_init：用于初始化自旋锁（Spinlock）。自旋锁是一种忙等待锁，如果锁已被占用，线程会不断循环检查锁的状态，直到锁被释放。
+- std::atomic_flag 是 C++11 引入的一种原子布尔类型，特别适用于实现自旋锁或者其他简单的同步机制。
 
 ## todo
 - [x] `"%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"` 日志格式解析失败（`str = m_pattern.substr(i+1, n-i-1);`中`n-i-1`错写为`n-i-i`）

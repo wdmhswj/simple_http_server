@@ -1,0 +1,8 @@
+
+logs:
+    - name: file_monitor
+      level: info
+      appenders:
+          # - type: StdoutLogAppender
+          - type: FileLogAppender
+            file: file_monitor.txt

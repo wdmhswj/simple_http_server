@@ -72,4 +72,27 @@ void RWMutex::unlock() {
         throw std::logic_error("pthread_rwlock_unlock error");
     }
 }
+
+
+SpinLock::SpinLock() {
+    if(pthread_spin_init(&m_mutex, 0)) {
+        throw std::logic_error("pthread_spin_init error");
+    }
+}
+SpinLock::~SpinLock() {
+    if(pthread_spin_destroy(&m_mutex)) {
+        std::cout << "pthread_spin_destroy error" << std::endl;
+    }
+}
+
+void SpinLock::lock() {
+    if(pthread_spin_lock(&m_mutex)) {
+        throw std::logic_error("pthread_spin_lock error");
+    }
+}
+void SpinLock::unlock() {
+    if(pthread_spin_unlock(&m_mutex)) {
+        throw std::logic_error("pthread_spin_unlock error");
+    }
+}
 }

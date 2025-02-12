@@ -357,3 +357,18 @@ target_link_libraries(test_thread_posix PRIVATE
     config_static
     log_static
 )
+
+
+# 添加可执行文件
+add_executable(file_monitor tests/file_monitor.cpp)
+set_target_properties(file_monitor PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF )
+
+set_target_properties(file_monitor PROPERTIES 
+    OUTPUT_NAME "file_monitor"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+target_link_libraries(file_monitor PRIVATE 
+    log_static
+    config_static
+)

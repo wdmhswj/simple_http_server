@@ -57,3 +57,9 @@
 ## 2025/2/10: 线程模块
 - [x] 信号量与互斥量：读写分离，出线程构造函数之前保证线程已经启动 
 - [x] 日志模块完善线程安全：加mutex: LogAppender/Logger/LoggerManager, LogAppender::setFormatter()/getFormatter()(非const成员函数)/toYamlString(), Logger::setFormatter()/toYamlString(), 添加空Mutex（以便调试）
+
+## 2025/2/12: 线程模块
+- [x] 自旋锁实现/测试
+- [x] 测试时对日志文件的大小进行监测、统计并显示
+- [x] CASLock
+- [x] FileLogAppender::m_LastTime/reopen: 写文件时周期性reopen
