@@ -175,7 +175,7 @@ void test_class() {
         } \
         SHS_LOG_INFO(SHS_LOG_ROOT()) <<  prefix << ": size=" << m.size(); \
     }
-    g_person->addListener(2333, [](const Person& o, const Person& n) {
+    g_person->addListener([](const Person& o, const Person& n) {
         SHS_LOG_INFO(SHS_LOG_ROOT()) << "old value: " << o.toString() << "; new value: " << n.toString();
     });
 
@@ -217,5 +217,12 @@ int main(int argc, char** argv) {
     // test_config();
     // test_class();
     test_log();
+
+    shs::Config::Visit([](shs::ConfigVarBase::ptr var) {
+        SHS_LOG_INFO(SHS_LOG_ROOT()) << "name=" << var->getName()
+                    << " description=" << var->getDescription()
+                    << " typename=" << var->getTypeName()
+                    << " value=" << var->toString();
+    });
     return 0;
 }

@@ -671,7 +671,7 @@ struct LogIniter
 {
     LogIniter() {
         // 添加的此回调函数实现对 LoggerMgr 中的 loggers 的 添加/修改/删除，借助 SHS_LOG_NAME()
-        g_log_defines->addListener(0x202527, [](const std::set<LogDefine>& old_value, const std::set<LogDefine>& new_value) {
+        g_log_defines->addListener([](const std::set<LogDefine>& old_value, const std::set<LogDefine>& new_value) {
             SHS_LOG_INFO(SHS_LOG_ROOT()) << "on_logger_conf_changed";
             for(auto& i: new_value) {
                 // 在旧配置中查找

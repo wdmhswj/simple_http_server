@@ -59,9 +59,17 @@ void Config::LoadFromYaml(const YAML::Node& root) {
 }
 // 查询配置参数，返回配置参数的基类
 ConfigVarBase::ptr Config::LookupBase(const std::string& name) {
+    RWMutexType::ReadLock lock(GetMutex());
     auto it = GetDatas().find(name);
     return it==GetDatas().end() ? nullptr : it->second;
 }
 
+void Config::Visit(std::function<void(ConfigVarBase::ptr)> cb) {
+    RWMutexType::ReadLock lock(GetMutex());
+    ConfigVarMap& m = GetDatas();
+    for(const auto& i: m) {
+        cb(i.second);
+    }
+}
 
 }

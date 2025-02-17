@@ -63,3 +63,7 @@
 - [x] 测试时对日志文件的大小进行监测、统计并显示
 - [x] CASLock
 - [x] FileLogAppender::m_LastTime/reopen: 写文件时周期性reopen
+
+## 2025/2/17: 线程模块与配置模块整合
+- [x] config.h: class ConfigVar/Config
+- [x] addListener() 重写，新增 Visit() 函数

@@ -17,6 +17,7 @@
 #include <mutex>
 #include <iostream>
 #include "src/_log/log.h"
+#include "src/mutex/mutex.h"
 
 namespace shs {
 // 配置变量的基类
@@ -248,6 +249,7 @@ class ConfigVar: public ConfigVarBase {
 public:
     using ptr = std::shared_ptr<ConfigVar>;
     using on_change_cb = std::function<void (const T& old_value, const T& new_value)>;
+    using RWMutexType = RWMutex;
 
     ConfigVar(const T& default_value, const std::string& name, const std::string& description=""): ConfigVarBase(name, description), m_val(default_value) {}
 
@@ -255,6 +257,7 @@ public:
         try {
             // return boost::lexical_cast<std::string>(m_val);
             // return Lexical_cast<T, std::string>()(m_val);
+            RWMutexType::ReadLock lock(m_mutex);
             return ToStr()(m_val);
         } catch(std::exception& e) {    
             SHS_LOG_ERROR(SHS_LOG_ROOT()) << "ConfigVar::toString exception " << e.what() << " convert: " << typeid(m_val).name() << " to string";
@@ -277,42 +280,56 @@ public:
     std::string getTypeName() const override { return TypeToName<T>();}
     const T getValue() const { return m_val; }
     void setValue(const T& val) {
-        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "setValue()";
-        if(m_val == val) 
-            return;
-        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "m_cbs.size(): " << m_cbs.size();
-        for(auto& i: m_cbs) {
-            i.second(m_val, val);
+        {
+            RWMutexType::ReadLock lock(m_mutex);
+            if(m_val == val) 
+                return;
+            for(auto& i: m_cbs) {
+                i.second(m_val, val);
+            }
         }
+        RWMutexType::WriteLock lock(m_mutex);
         m_val = val;
     }
 
-    void addListener(uint64_t key, on_change_cb cb) {
-        // SHS_LOG_INFO(SHS_LOG_ROOT()) << "addListener()";
-        m_cbs.insert({key, cb});    // insert 需要 key 原本不存在才会添加
+    uint64_t addListener(on_change_cb cb) {
+        static uint64_t s_func_id = 0;
+        RWMutexType::WriteLock lock(m_mutex);
+        ++s_func_id;
+        m_cbs.insert({s_func_id, cb});    // insert 需要 key 原本不存在才会添加
+        return s_func_id;
     }
 
     void delListener(uint64_t key) {
+        RWMutexType::WriteLock lock(m_mutex);
         m_cbs.erase(key);   // 若 key 不存在，不会产生异常，会返回0
     }
 
     on_change_cb getListener(uint64_t key) {
+        RWMutexType::ReadLock lock(m_mutex);
         auto it = m_cbs.find(key);
         return it==m_cbs.end() ? nullptr : it->second;
+    }
+    
+    void clearListener() {
+        RWMutexType::WriteLock lock(m_mutex);
+        m_cbs.clear();
     }
 private:
     T m_val;
     // 变更回调函数组, uint64_t key,要求唯一，一般可以用hash
     std::map<uint64_t, on_change_cb> m_cbs;
+    RWMutexType m_mutex;
 };
 
 class Config {
 public:
     using ConfigVarMap = std::map<std::string, ConfigVarBase::ptr>;
+    using RWMutexType = RWMutex;
 
     template<typename T>
     static typename ConfigVar<T>::ptr Lookup(const T& default_value, const std::string& name, const std::string& description="") {
-
+        RWMutexType::WriteLock lock(GetMutex());
         auto it = GetDatas().find(name);
         if(it != GetDatas().end()) {
             auto ptr = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
@@ -355,6 +372,7 @@ public:
 
     template<typename T>
     static typename ConfigVar<T>::ptr Lookup(const std::string& name) {
+        RWMutexType::ReadLock lock(GetMutex());
         auto it = GetDatas().find(name);
         if(it == GetDatas().end()) {
             return nullptr;
@@ -367,6 +385,8 @@ public:
     // 查询配置参数，返回配置参数的基类
     static ConfigVarBase::ptr LookupBase(const std::string& name);
 
+    // 访问配置变量，参数是负责访问配置的可调用对象
+    static void Visit(std::function<void(ConfigVarBase::ptr)> cb);
 
     // static void debug() {
     //     std::cout << "m_datas: size=" << m_datas.size() << "\n";
@@ -374,6 +394,8 @@ public:
     //         std::cout << "\t" << i.first << std::endl;
     //     }
     // }
+
+
 private:
     // static std::mutex m_mutex;  // 添加互斥锁
 
@@ -381,6 +403,11 @@ private:
     static ConfigVarMap& GetDatas() {
         static ConfigVarMap s_datas;
         return s_datas;
+    }
+
+    static RWMutexType& GetMutex() {
+        static RWMutexType s_mutex;
+        return s_mutex;
     }
 };
 
