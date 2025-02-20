@@ -1,6 +1,9 @@
 // 线程相关的封装
 
-#pragma once
+// #pragma once
+#ifndef THREAD_POSIX_H
+#define THREAD_POSIX_H
+
 #include <cstdint>
 #include <thread>
 #include <functional>
@@ -14,11 +17,11 @@
 
 namespace shs {
 
-class Thread: NonCopyable {
+class Thread_posix: NonCopyable {
 public:
-    using ptr = std::shared_ptr<Thread>;
-    Thread(std::function<void()> cb, const std::string& name);
-    ~Thread();
+    using ptr = std::shared_ptr<Thread_posix>;
+    Thread_posix(std::function<void()> cb, const std::string& name);
+    ~Thread_posix();
 
     int64_t getId() const { return m_id; }
     const std::string& getName() const { return m_name; }
@@ -27,7 +30,7 @@ public:
     void join();
 
     // 获取当前的线程指针
-    static Thread* GetThis();
+    static Thread_posix* GetThis();
 
     // 获取当前的线程名称
     static const std::string& GetName();
@@ -60,3 +63,5 @@ private:
 };
 
 }
+
+#endif

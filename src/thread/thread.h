@@ -1,6 +1,9 @@
 // 线程相关的封装
 
-#pragma once
+// #pragma once
+#ifndef THREAD_H
+#define THREAD_H
+
 #include <cstdint>
 #include <thread>
 #include <functional>
@@ -64,3 +67,5 @@ private:
 };
 
 }
+
+#endif

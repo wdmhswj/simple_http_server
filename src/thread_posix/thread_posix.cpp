@@ -4,23 +4,23 @@
 
 namespace shs {
 
-static thread_local Thread* t_thread = nullptr;             // 借助 thread_local 实现线程内的唯一性
+static thread_local Thread_posix* t_thread = nullptr;             // 借助 thread_local 实现线程内的唯一性
 static thread_local std::string t_thread_name = "UNKNOW";
 
 static shs::Logger::ptr g_logger = SHS_LOG_NAME("system");
 
-Thread* Thread::GetThis() {
+Thread_posix* Thread_posix::GetThis() {
     return t_thread;
 }
 
 
 // 获取当前的线程名称
-const std::string& Thread::GetName() {
+const std::string& Thread_posix::GetName() {
     return t_thread_name;
 }
 
 // 设置当前线程名称
-void Thread::SetName(const std::string& name) {
+void Thread_posix::SetName(const std::string& name) {
     if(name.empty())
         return;
     if(t_thread) 
@@ -29,13 +29,13 @@ void Thread::SetName(const std::string& name) {
     
 }
 
-Thread::Thread(std::function<void()> cb, const std::string& name)
+Thread_posix::Thread_posix(std::function<void()> cb, const std::string& name)
     :m_cb(cb)
     ,m_name(name) {
     if(name.empty())
         m_name = "UNKNOW";
 
-    int rt = pthread_create(&m_thread, nullptr, &Thread::run, this);    // 创建线程并执行 run 函数
+    int rt = pthread_create(&m_thread, nullptr, &Thread_posix::run, this);    // 创建线程并执行 run 函数
     if(rt) {
         SHS_LOG_ERROR(g_logger) << "pthread_create thread fail, rt=" << rt << " name=" << name;
         throw std::logic_error("pthread_create error");
@@ -43,7 +43,7 @@ Thread::Thread(std::function<void()> cb, const std::string& name)
 
 }
 
-Thread::~Thread() {
+Thread_posix::~Thread_posix() {
 
     if(m_thread) {
         pthread_detach(m_thread);
@@ -51,7 +51,7 @@ Thread::~Thread() {
 
 }
 
-void Thread::join() {
+void Thread_posix::join() {
 
     if(m_thread) {
         int rt = pthread_join(m_thread, nullptr);
@@ -65,8 +65,8 @@ void Thread::join() {
 }
 
 
-void* Thread::run(void* arg) {
-    Thread* thread = static_cast<Thread*>(arg); // arg 指向Thread对象
+void* Thread_posix::run(void* arg) {
+    Thread_posix* thread = static_cast<Thread_posix*>(arg); // arg 指向Thread_posix对象
     t_thread = thread;
     t_thread_name = thread->m_name;             // ?
     thread->m_id = shs::GetThreadIdBySyscall();

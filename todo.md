@@ -67,3 +67,8 @@
 ## 2025/2/17: 线程模块与配置模块整合
 - [x] config.h: class ConfigVar/Config
 - [x] addListener() 重写，新增 Visit() 函数
+
+## 2025/2/20：协程模块
+- [ ] test_util.cpp
+- [ ] macro.h
+- [ ] util.h, backtrace

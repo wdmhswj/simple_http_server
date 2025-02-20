@@ -13,10 +13,10 @@ shs::RWMutex s_rwmutex;
 shs::Mutex s_mutex;
 
 void fun1() {
-    SHS_LOG_INFO(g_logger) << "name: " << shs::Thread::GetName()
-                             << " this.name: " << shs::Thread::GetThis()->getName()
+    SHS_LOG_INFO(g_logger) << "name: " << shs::Thread_posix::GetName()
+                             << " this.name: " << shs::Thread_posix::GetThis()->getName()
                              << " id: " << shs::GetThreadIdBySyscall()
-                             << " this.id: " << shs::Thread::GetThis()->getId();
+                             << " this.id: " << shs::Thread_posix::GetThis()->getId();
 
     // std::this_thread::sleep_for(std::chrono::seconds(1));
     for(long long i = 0; i < 1000000; ++i) {
@@ -43,11 +43,11 @@ int main(int argc, char** argv) {
     YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log2.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log2.yml"));
     shs::Config::LoadFromYaml(root);
 
-    std::vector<shs::Thread::ptr> thrs;
+    std::vector<shs::Thread_posix::ptr> thrs;
     for(int i = 0; i < 2; ++i) {
-        // shs::Thread::ptr thr(new shs::Thread(&fun1, "name_" + std::to_string(i)));
-        shs::Thread::ptr thr1(new shs::Thread(&fun2, "name_" + std::to_string(i * 2 + 1)));
-        shs::Thread::ptr thr2(new shs::Thread(&fun3, "name_" + std::to_string(i * 2)));
+        // shs::Thread_posix::ptr thr(new shs::Thread_posix(&fun1, "name_" + std::to_string(i)));
+        shs::Thread_posix::ptr thr1(new shs::Thread_posix(&fun2, "name_" + std::to_string(i * 2 + 1)));
+        shs::Thread_posix::ptr thr2(new shs::Thread_posix(&fun3, "name_" + std::to_string(i * 2)));
         // thrs.push_back(thr);
         thrs.push_back(thr1);
         thrs.push_back(thr2);

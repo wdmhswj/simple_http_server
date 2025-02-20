@@ -5,7 +5,7 @@
 #include <sstream>
 #include <typeinfo>
 #include <cxxabi.h>
-
+#include <vector>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -35,4 +35,9 @@ const char* TypeToName() {
 
 std::string chooseByOs(const std::string& win, const std::string& linux);
 
+// 获取当前的调用栈
+void Backtrace(std::vector<std::string>& bt, int size=64, int skip=1);
+
+// 获取当前栈信息的字符串
+std::string BacktraceToString(int size=64, int skip=2, const std::string& prefix="");
 }

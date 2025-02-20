@@ -150,11 +150,13 @@ target_link_directories(log_static PRIVATE
 target_link_libraries(log PRIVATE
     yaml-cpp
     mutex_static
+    thread_posix_static
 )
 
 target_link_libraries(log_static PRIVATE
     yaml-cpp
     mutex_static
+    thread_posix_static
 )
 
 # config
@@ -195,6 +197,7 @@ target_link_libraries(config_static
     log_static
 )
 
+if(OFF)
 # thread
 
 set(LIB_SRC_THREAD 
@@ -230,6 +233,8 @@ target_link_libraries(thread_static
     PRIVATE
     log_static
 )
+endif()
+
 
 # thread_posix
 
@@ -248,7 +253,7 @@ set_target_properties(thread_posix PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )
 
-add_library(thread_posix_static STATIC ${LIB_SRC_THREAD})
+add_library(thread_posix_static STATIC ${LIB_SRC_THREAD_POSIX})
 
 # 将 __FILE__ 宏改为相对路径
 redefine_file_macro(thread_posix_static)
@@ -310,6 +315,7 @@ target_link_libraries(test_config PRIVATE
     yaml-cpp
 )
 
+if(OFF)
 # test_thread
 
 add_executable(test_thread tests/test_thread.cpp)
@@ -334,6 +340,7 @@ target_link_libraries(test_thread PRIVATE
     thread_static
     mutex_static
 )
+endif()
 
 # test_thread_posix
 
@@ -371,4 +378,26 @@ set_target_properties(file_monitor PROPERTIES
 target_link_libraries(file_monitor PRIVATE 
     log_static
     config_static
+)
+
+
+
+# test_util
+
+add_executable(test_util tests/test_util.cpp)
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(test_util)
+
+# target_include_directories(test_util PRIVATE 
+#     ${CMAKE_SOURCE_DIR}/src/_log
+# )
+
+set_target_properties(test_util PROPERTIES 
+    OUTPUT_NAME "test_util"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+target_link_libraries(test_util PRIVATE
+    log_static
 )
