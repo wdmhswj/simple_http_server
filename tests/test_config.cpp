@@ -38,7 +38,7 @@ void print_yaml(const YAML::Node& node, int level) {
 
 void test_yaml() {
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "~/repositories/simple_http_server/bin/conf/log.yml"));
     print_yaml(root, 0);
 }
 void test_config() {
@@ -71,7 +71,7 @@ void test_config() {
     XXM(g_umap_int_value_config, umap_int, before);
     // shs::Config::debug();
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
+    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "~/repositories/simple_http_server/bin/conf/log.yml"));
     shs::Config::LoadFromYaml(root);
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_int_value_config->getValue();
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_double_value_config->toString();
@@ -184,7 +184,9 @@ void test_class() {
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "before: " << g_list_person->toString();
 
     // YAML::Node root = YAML::LoadFile("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml");
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log.yml"));
+    std::string yaml_path = RESOURCES_DIR "/conf/log.yaml";
+    // YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log.yml", "~/repositories/simple_http_server/bin/conf/log.yml"));
+    YAML::Node root = YAML::LoadFile(yaml_path);
     shs::Config::LoadFromYaml(root);
 
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "after: " << g_person->getValue().toString() << " - " << g_person->toString();
@@ -199,7 +201,8 @@ void test_log() {
     SHS_LOG_INFO(SHS_LOG_ROOT()) << "hello root" << std::endl;
     SHS_LOG_INFO(system_log) << "hello system" << std::endl;
     std::cout << shs::LoggerMgr::GetInstance()->toYamlString() << std::endl;
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\test.yml", "/home/wsl/repositories/simple_http_server/bin/conf/test.yml"));
+    // YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\test.yml", "~/repositories/simple_http_server/bin/conf/test.yml"));
+    YAML::Node root = YAML::LoadFile(RESOURCES_DIR "/conf/test.yml");
     shs::Config::LoadFromYaml(root);
     std::cout << "=============" << std::endl;
     std::cout << shs::LoggerMgr::GetInstance()->toYamlString() << std::endl;

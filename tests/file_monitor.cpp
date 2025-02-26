@@ -59,9 +59,11 @@ int main(int argc, char** argv) {
     // std::cout << argv[1] << std::endl;
     // return 0;
 
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\file_monitor.yml", "/home/wsl/repositories/simple_http_server/bin/conf/file_monitor.yml"));
+    // YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\file_monitor.yml", "~/repositories/simple_http_server/bin/conf/file_monitor.yml"));
+    YAML::Node root = YAML::LoadFile(RESOURCES_DIR "/conf/file_monitor.yml");
     shs::Config::LoadFromYaml(root);
-    std::string filepath = shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\mutex.txt", "/home/wsl/repositories/simple_http_server/bin/mutex.txt"); // 要监测的文件路径
+    // std::string filepath = shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\mutex.txt", "~/repositories/simple_http_server/bin/mutex.txt"); // 要监测的文件路径
+    std::string filepath = EXCUTABLE_DIR "/mutex.txt"; // 要监测的文件路径
 
     // std::string filepath = "test.txt";
     int interval = 1; // 检查间隔时间（秒）

@@ -40,7 +40,9 @@ void fun3() {
 
 int main(int argc, char** argv) {
     SHS_LOG_INFO(g_logger) << "thread test begin";
-    YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log2.yml", "/home/wsl/repositories/simple_http_server/bin/conf/log2.yml"));
+    std::string yaml_path = RESOURCES_DIR "/conf/log2.yml";
+    // YAML::Node root = YAML::LoadFile(shs::chooseByOs("D:\\repositories\\simple_http_server\\bin\\conf\\log2.yml", "~/repositories/simple_http_server/bin/conf/log2.yml"));
+    YAML::Node root = YAML::LoadFile(yaml_path);
     shs::Config::LoadFromYaml(root);
 
     std::vector<shs::Thread_posix::ptr> thrs;

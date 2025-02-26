@@ -68,6 +68,15 @@ else()
     message(">> unknow compiler.")
 endif()
 
+# 获取资源文件的绝对路径
+get_filename_component(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources" ABSOLUTE)
+get_filename_component(EXCUTABLE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin" ABSOLUTE)
+
+# 将资源目录作为宏传递给编译器
+add_definitions(-DRESOURCES_DIR="${RESOURCES_DIR}")
+add_definitions(-DEXCUTABLE_DIR="${EXCUTABLE_DIR}")
+
+
 
 # mutex
 set(LIB_SRC_MUTEX 
