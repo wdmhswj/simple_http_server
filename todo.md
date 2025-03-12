@@ -69,6 +69,10 @@
 - [x] addListener() 重写，新增 Visit() 函数
 
 ## 2025/2/20：协程模块
-- [ ] test_util.cpp
-- [ ] macro.h
-- [ ] util.h, backtrace
+- [x] test_util.cpp
+- [x] macro.h
+- [x] util.h, backtrace
+
+## 2025/3/12: 协程模块
+- [x] 学习 ucontext
+- [ ] fiber.h/fiber.cpp

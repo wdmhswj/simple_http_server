@@ -65,6 +65,16 @@ pthread pthread_create
 
 与 log 模块整合
 
+## 协程模块
+### 示意图
+```
+Thread ---> main_fiber <----> sub_fiber
+                ^
+                |
+                |
+                v
+            sub_fiber
+```
 ## 问题与解决
 - 日志模块需要线程模块获取线程名称，线程模块需要日志模块用于打印日志，但是由于实现了2种线程类，导致编译错误"error: redefinition of ‘class shs::Thread’"
   - 解决方案：两个Thread类重命名（不同名），暂时不构建其中一个Thread类
