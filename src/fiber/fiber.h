@@ -7,8 +7,14 @@
 
 namespace shs {
 
+// 协程调度类的声明
+class Scheduler;
+
 // 协程类
 class Fiber: public std::enable_shared_from_this<Fiber> {
+
+friend class Scheduler; // 有元类
+
 public:
     using ptr = std::shared_ptr<Fiber>;
 
@@ -27,8 +33,8 @@ public:
 
     ~Fiber();
 
-    // 重置协程执行函数，并设置线程状态
-    void reset(std::function<void()> 的b);
+    // 重置协程执行函数，并设置状态
+    void reset(std::function<void()> cb);
 
     // 将当前协程切换到运行状态
     void swapIn();
@@ -36,10 +42,10 @@ public:
     // 将当前协程切换到后台
     void swapOut();
 
-    // 将当前线程切换到执行状态
+    // 将当前线程切换到执行状态，执行的为当前线程的主协程
     void call();
 
-    // 将当前线程切换到后台
+    // 将当前线程切换到后台，返回到线程的主协程
     void back();
 
     // 获取协程id
@@ -54,9 +60,11 @@ public:
     // 返回当前所在的协程
     static Fiber::ptr GetThis();
 
-    // 
-
-    // 
+    // 将当前协程切换到后台，并设置为ready状态
+    static void YieldToReady();
+ 
+    // 将当前协程切换到后台，并设置为hold状态
+    static void YieldToHold();
 
     // 返回当前协程的总数目
     static uint64_t TotalFibers();
@@ -66,9 +74,12 @@ public:
 
     // 协程执行函数：执行完成返回到线程调度协程
     static void CallerMainFunc();
+
+    // 获取当前协程的id
+    static uint64_t GetFiberId();
 private:
 
-    // 无参构造函数：每个线程第一个协程的构造
+    // 无参构造函数：每个线程第一个协程(主协程)的构造
     Fiber();
 
     // 协程id
