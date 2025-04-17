@@ -281,6 +281,45 @@ target_link_libraries(thread_posix_static
     log_static
 )
 
+
+# fiber
+
+set(LIB_SRC_FIBER 
+    src/fiber/fiber.cpp
+)
+
+# 创建共享库
+add_library(fiber SHARED ${LIB_SRC_FIBER})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(fiber)
+
+set_target_properties(fiber PROPERTIES 
+    OUTPUT_NAME "fiber"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+)
+
+add_library(fiber_static STATIC ${LIB_SRC_FIBER})
+
+# 将 __FILE__ 宏改为相对路径
+redefine_file_macro(fiber_static)
+
+set_target_properties(fiber_static PROPERTIES 
+    OUTPUT_NAME "fiber_static"
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib
+)
+
+target_link_libraries(fiber
+    PRIVATE
+    yaml-cpp
+    log_static
+)
+target_link_libraries(config_static
+    PRIVATE
+    yaml-cpp
+    log_static
+)
+
 # test
 
 # 创建可执行文件
@@ -409,4 +448,12 @@ set_target_properties(test_util PROPERTIES
 
 target_link_libraries(test_util PRIVATE
     log_static
+)
+
+add_executable(test_fiber tests/test_fiber.cpp)
+redefine_file_macro(test_fiber)
+
+set_target_properties(test_fiber PROPERTIES
+    OUTPUT_NAME "test_fiber"
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 )

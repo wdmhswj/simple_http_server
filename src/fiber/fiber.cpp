@@ -1,8 +1,8 @@
 #include "fiber.h"
-#include "config.h"
-#include "macro.h"
-#include "log.h"
-#include "scheduler/scheduler.h"
+#include "src/config/config.h"
+#include "src/macro.h"
+#include "src/_log/log.h"
+#include "src/scheduler/scheduler.h"
 #include <atomic>
 
 namespace shs {
